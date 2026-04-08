@@ -70,6 +70,9 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   const explodeStartRef = useRef(0);
   const hasTriggeredRef = useRef(false);
   const appearedRef = useRef(0);
+  const prePickedIndexRef = useRef(-1); // random winner decided at scroll start
+  const lastSwitchTimeRef = useRef(0); // track when highlight last switched
+  const randomPhotoIndexRef = useRef(-1); // random photo decided at scroll start
 
   // Ball center positions (arc arrangement)
   const ballPositions = useMemo(() => {
@@ -123,18 +126,18 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
 
     if (!groupRef.current) return;
 
-    // ── APPEARING: balls scale up from 0 over 1 second ──
+    // ── APPEARING: balls scale up from 0 quickly (0.3s) ──
     if (phaseRef.current === "APPEARING") {
       appearedRef.current += delta;
-      const progress = Math.min(appearedRef.current / 1.0, 1);
+      const progress = Math.min(appearedRef.current / 0.3, 1);
 
       ballRefs.current.forEach((mesh, i) => {
         if (!mesh) return;
         // Staggered appear
-        const stagger = i * 0.1;
+        const stagger = i * 0.04;
         const localProgress = Math.max(
           0,
-          Math.min(1, (progress - stagger) / (1 - stagger * 1)),
+          Math.min(1, (progress - stagger) / (1 - stagger)),
         );
         const eased = 1 - Math.pow(1 - localProgress, 3); // ease out cubic
         mesh.scale.setScalar(eased);
@@ -145,25 +148,43 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
         phaseRef.current = "SCROLLING";
         setPhase("SCROLLING");
         scrollStartRef.current = t;
+        // Pre-decide the random winner and random photo
+        prePickedIndexRef.current = Math.floor(Math.random() * 5);
+        if (uploadedPhotos.length > 0) {
+          randomPhotoIndexRef.current = Math.floor(
+            Math.random() * uploadedPhotos.length,
+          );
+        }
       }
     }
 
-    // ── SCROLLING: spotlight sweeps across balls for 5 seconds ──
+    // ── SCROLLING: randomly highlight balls, slowing down over 5 seconds ──
     if (phaseRef.current === "SCROLLING") {
       const elapsed = t - scrollStartRef.current;
       const progress = Math.min(elapsed / SCROLL_DURATION, 1);
 
-      // Speed starts fast and slows down (quadratic deceleration)
-      // Cumulative position: integral of speed curve
-      const speed = 1 - progress * progress;
-      const cycleSpeed = 8 - progress * 6; // cycles per second: 8 → 2
-      const rawIndex = (elapsed * cycleSpeed) % 5;
-      const currentHighlight = Math.floor(Math.abs(rawIndex)) % 5;
+      // Interval between switches: starts at 0.08s, slows to 0.6s
+      const interval = 0.08 + progress * progress * 0.52;
+      const timeSinceSwitch = t - lastSwitchTimeRef.current;
 
-      if (currentHighlight !== highlightRef.current) {
-        highlightRef.current = currentHighlight;
-        setHighlightIndex(currentHighlight);
+      if (timeSinceSwitch >= interval) {
+        lastSwitchTimeRef.current = t;
+        // Pick a random DIFFERENT ball
+        let next;
+        do {
+          next = Math.floor(Math.random() * 5);
+        } while (next === highlightRef.current && progress < 0.95);
+
+        // In the last 5% of time, snap to the pre-picked winner
+        if (progress >= 0.95) {
+          next = prePickedIndexRef.current;
+        }
+
+        highlightRef.current = next;
+        setHighlightIndex(next);
       }
+
+      const currentHighlight = highlightRef.current;
 
       // Update ball visuals
       ballRefs.current.forEach((mesh, i) => {
@@ -190,10 +211,12 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
         spotTargetRef.current.position.lerp(targetPos, 0.2);
       }
 
-      // Done scrolling
+      // Done scrolling - use pre-picked winner
       if (progress >= 1) {
-        const finalPick = currentHighlight;
+        const finalPick = prePickedIndexRef.current;
         setPickedIndex(finalPick);
+        highlightRef.current = finalPick;
+        setHighlightIndex(finalPick);
         phaseRef.current = "PICKED";
         setPhase("PICKED");
         explodeStartRef.current = t;
@@ -259,10 +282,9 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
       }
 
       if (progress >= 1) {
-        // Fire photo callback
-        if (uploadedPhotos.length > 0) {
-          const rndIdx = Math.floor(Math.random() * uploadedPhotos.length);
-          onPhotoSelected(uploadedPhotos[rndIdx]);
+        // Fire photo callback using pre-picked random photo
+        if (uploadedPhotos.length > 0 && randomPhotoIndexRef.current >= 0) {
+          onPhotoSelected(uploadedPhotos[randomPhotoIndexRef.current]);
         } else {
           onPhotoSelected(null);
         }
