@@ -65,6 +65,7 @@ export default function App() {
   const [isLoadingShare, setIsLoadingShare] = useState(false);
   const [isSharedView, setIsSharedView] = useState(false);
   const [twoHandsDetected, setTwoHandsDetected] = useState(false);
+  const [peaceGestureDetected, setPeaceGestureDetected] = useState(false);
   const [closestPhoto, setClosestPhoto] = useState<string | null>(null);
   const [luckyBallsActive, setLuckyBallsActive] = useState(false);
   const [luckyBallsReady, setLuckyBallsReady] = useState(false);
@@ -127,6 +128,10 @@ export default function App() {
     setTwoHandsDetected(detected);
   };
 
+  const handlePeaceGestureDetected = (detected: boolean) => {
+    setPeaceGestureDetected(detected);
+  };
+
   const handleClosestPhotoChange = (photoUrl: string | null) => {
     setClosestPhoto(photoUrl);
   };
@@ -156,14 +161,14 @@ export default function App() {
   useEffect(() => {
     if (
       luckyBallsReady &&
-      twoHandsDetected &&
+      peaceGestureDetected &&
       !luckyBallsUsedRef.current &&
       !luckyBallsActive
     ) {
       luckyBallsUsedRef.current = true;
       setLuckyBallsActive(true);
     }
-  }, [luckyBallsReady, twoHandsDetected, luckyBallsActive]);
+  }, [luckyBallsReady, peaceGestureDetected, luckyBallsActive]);
 
   const handleLuckyBallsClose = () => {
     setLuckyBallsActive(false);
@@ -181,11 +186,11 @@ export default function App() {
 
   // Close lucky photo overlay when hands are hidden
   useEffect(() => {
-    if (luckyPhoto && !twoHandsDetected) {
+    if (luckyPhoto && !peaceGestureDetected) {
       setLuckyPhoto(null);
       setLuckyBallsActive(false);
     }
-  }, [twoHandsDetected, luckyPhoto]);
+  }, [peaceGestureDetected, luckyPhoto]);
 
   const handlePhotosUpload = (photos: string[]) => {
     setUploadedPhotos(photos);
@@ -206,6 +211,7 @@ export default function App() {
               handPosition={handPosition}
               uploadedPhotos={uploadedPhotos}
               twoHandsDetected={twoHandsDetected}
+              peaceGestureDetected={peaceGestureDetected}
               onClosestPhotoChange={handleClosestPhotoChange}
               luckyBallsActive={luckyBallsActive}
               onLuckyPhotoSelected={handleLuckyPhotoSelected}
@@ -246,6 +252,7 @@ export default function App() {
         onModeChange={setMode}
         onHandPosition={handleHandPosition}
         onTwoHandsDetected={handleTwoHandsDetected}
+        onPeaceGestureDetected={handlePeaceGestureDetected}
       />
 
       {/* Lucky Photo Polaroid Overlay - shown after ball explodes */}

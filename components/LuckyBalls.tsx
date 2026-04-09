@@ -38,6 +38,7 @@ const BALL_RADIUS = 2.5;
 interface LuckyBalls3DProps {
   active: boolean;
   twoHandsDetected: boolean;
+  peaceGestureDetected: boolean;
   uploadedPhotos: string[];
   onPhotoSelected: (photoUrl: string | null) => void;
   onDone: () => void;
@@ -46,6 +47,7 @@ interface LuckyBalls3DProps {
 export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   active,
   twoHandsDetected,
+  peaceGestureDetected,
   uploadedPhotos,
   onPhotoSelected,
   onDone,
@@ -96,12 +98,12 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
 
   // When hands hidden during DONE phase → close
   useEffect(() => {
-    if (phaseRef.current === "DONE" && !twoHandsDetected) {
+    if (phaseRef.current === "DONE" && !peaceGestureDetected) {
       onPhotoSelected(null);
       cleanup();
       onDone();
     }
-  }, [twoHandsDetected, onDone, onPhotoSelected]);
+  }, [peaceGestureDetected, onDone, onPhotoSelected]);
 
   // Reset when deactivated externally
   useEffect(() => {
