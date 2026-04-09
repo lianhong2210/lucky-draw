@@ -358,7 +358,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
         }
       } else if (
         indexExtended &&
-        middleExtended &&
+        !middleExtended &&
         !ringExtended &&
         !pinkyExtended
       ) {
