@@ -7,7 +7,7 @@ let cachedCandidates: [number, number][] | null = null;
 let loadPromise: Promise<[number, number][]> | null = null;
 
 /**
- * Loads the meztiz.svg, renders it to a canvas, and extracts
+ * Loads the mestiz.svg, renders it to a canvas, and extracts
  * all red-ish pixel positions as candidate sample points.
  */
 export function loadSvgCandidates(): Promise<[number, number][]> {
@@ -60,7 +60,7 @@ export function loadSvgCandidates(): Promise<[number, number][]> {
       resolve(candidates);
     };
     img.onerror = () => resolve([]);
-    img.src = "/photos/meztiz.svg";
+    img.src = "/photos/mestiz.svg";
   });
 
   return loadPromise;
