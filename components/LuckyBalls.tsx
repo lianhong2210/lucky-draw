@@ -30,10 +30,10 @@ type Phase =
 const BALL_COLORS = ["#FF4444", "#44AAFF", "#44FF88", "#FFD700", "#CC44FF"];
 const BALL_EMISSIVE = ["#440000", "#000044", "#004400", "#443300", "#220044"];
 const SCROLL_DURATION = 5; // seconds
-const BALL_SPACING = 2.5;
+const BALL_SPACING = 4;
 const BALL_Y = 7; // height in scene (middle of tree area)
-const BALL_Z = 8; // in front of tree
-const BALL_RADIUS = 0.7;
+const BALL_Z = -2; // in front of logo
+const BALL_RADIUS = 1.5;
 
 interface LuckyBalls3DProps {
   active: boolean;
