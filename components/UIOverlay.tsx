@@ -131,7 +131,7 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({
       const { shareId, uploadUrls } = urlsData;
 
       // Step 2: Upload images directly to R2 using presigned URLs
-      setUploadProgress(`上传照片中 (0/${uploadedPhotos.length})...`);
+      setUploadProgress(`Uploading photos (0/${uploadedPhotos.length})...`);
 
       let uploadedCount = 0;
       const uploadPromises = uploadedPhotos.map(async (photo, index) => {
@@ -152,7 +152,7 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({
 
         uploadedCount++;
         setUploadProgress(
-          `上传照片中 (${uploadedCount}/${uploadedPhotos.length})...`,
+          `Uploading photos (${uploadedCount}/${uploadedPhotos.length})...`,
         );
         return publicUrl;
       });
@@ -238,7 +238,7 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({
       {/* Header */}
       <header className="absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
         <h1 className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#F5E6BF] to-[#D4AF37] font-serif drop-shadow-lg tracking-wider text-center">
-          Mestiz
+          Mestiz Lucky Draw
         </h1>
       </header>
 
