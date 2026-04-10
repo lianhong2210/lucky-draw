@@ -86,7 +86,7 @@ export function sampleSvgVector3(
     points.push(
       new THREE.Vector3(
         nx + (Math.random() - 0.5) * jitter,
-        ny + 8.5 + (Math.random() - 0.5) * jitter,
+        ny + 4.5 + (Math.random() - 0.5) * jitter,
         (Math.random() - 0.5) * 0.15,
       ),
     );
@@ -109,7 +109,7 @@ export function fillSvgTargetPositions(
     const ny = (0.5 - py / CANVAS_SIZE) * SCALE;
     const jitter = 0.04;
     target[i * 3] = nx + (Math.random() - 0.5) * jitter;
-    target[i * 3 + 1] = ny + 8.5 + (Math.random() - 0.5) * jitter;
+    target[i * 3 + 1] = ny + 4.5 + (Math.random() - 0.5) * jitter;
     target[i * 3 + 2] = 0.3 + Math.random() * 0.2; // behind the ornaments
   }
 }
