@@ -71,6 +71,15 @@ export default function App() {
   const [luckyBallsReady, setLuckyBallsReady] = useState(false);
   const [luckyPhoto, setLuckyPhoto] = useState<string | null>(null);
 
+  // New state for finger pointer, pinch, swipe
+  const [indexFingerPos, setIndexFingerPos] = useState<{
+    x: number;
+    y: number;
+    detected: boolean;
+  }>({ x: 0.5, y: 0.5, detected: false });
+  const [isPinching, setIsPinching] = useState(false);
+  const orbitOffsetRef = useRef(0);
+
   // Check for share parameter in URL on mount
   useEffect(() => {
     const loadSharedPhotos = async () => {
@@ -132,6 +141,18 @@ export default function App() {
     setPeaceGestureDetected(detected);
   };
 
+  const handleIndexFingerPosition = (x: number, y: number, detected: boolean) => {
+    setIndexFingerPos({ x, y, detected });
+  };
+
+  const handlePinchDetected = (pinching: boolean) => {
+    setIsPinching(pinching);
+  };
+
+  const handleSwipe = (deltaX: number) => {
+    orbitOffsetRef.current += deltaX * 3; // amplify swipe into orbit rotation
+  };
+
   const handleClosestPhotoChange = (photoUrl: string | null) => {
     setClosestPhoto(photoUrl);
   };
@@ -157,18 +178,12 @@ export default function App() {
     };
   }, [mode]);
 
-  // Activate lucky balls when conditions met: ready + two hands + not already used
+  // Activate orbit balls once a hand is detected - they stay visible permanently
   useEffect(() => {
-    if (
-      luckyBallsReady &&
-      peaceGestureDetected &&
-      !luckyBallsUsedRef.current &&
-      !luckyBallsActive
-    ) {
-      luckyBallsUsedRef.current = true;
+    if (handPosition.detected && !luckyBallsActive) {
       setLuckyBallsActive(true);
     }
-  }, [luckyBallsReady, peaceGestureDetected, luckyBallsActive]);
+  }, [handPosition.detected, luckyBallsActive]);
 
   const handleLuckyBallsClose = () => {
     setLuckyBallsActive(false);
@@ -216,6 +231,9 @@ export default function App() {
               luckyBallsActive={luckyBallsActive}
               onLuckyPhotoSelected={handleLuckyPhotoSelected}
               onLuckyBallsDone={handleLuckyBallsDone}
+              indexFingerPos={indexFingerPos}
+              isPinching={isPinching}
+              orbitOffsetRef={orbitOffsetRef}
             />
           </Suspense>
         </Canvas>
@@ -253,7 +271,36 @@ export default function App() {
         onHandPosition={handleHandPosition}
         onTwoHandsDetected={handleTwoHandsDetected}
         onPeaceGestureDetected={handlePeaceGestureDetected}
+        onIndexFingerPosition={handleIndexFingerPosition}
+        onPinchDetected={handlePinchDetected}
+        onSwipe={handleSwipe}
       />
+
+      {/* Finger Pointer Overlay - follows index finger */}
+      {indexFingerPos.detected && (
+        <div
+          className="fixed z-30 pointer-events-none"
+          style={{
+            left: `${(1 - indexFingerPos.x) * 100}%`,
+            top: `${indexFingerPos.y * 100}%`,
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <div
+            className={`w-6 h-6 rounded-full border-2 transition-all duration-100 ${
+              isPinching
+                ? "border-red-400 bg-red-400/40 scale-75"
+                : "border-[#D4AF37] bg-[#D4AF37]/20"
+            }`}
+            style={{
+              boxShadow: isPinching
+                ? "0 0 16px rgba(248,113,113,0.6)"
+                : "0 0 16px rgba(212,175,55,0.5)",
+            }}
+          />
+          <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />
+        </div>
+      )}
 
       {/* Lucky Photo Polaroid Overlay - shown after ball explodes */}
       {luckyPhoto && (

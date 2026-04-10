@@ -8,6 +8,9 @@ interface GestureControllerProps {
   onHandPosition?: (x: number, y: number, detected: boolean) => void;
   onTwoHandsDetected?: (detected: boolean) => void;
   onPeaceGestureDetected?: (detected: boolean) => void;
+  onIndexFingerPosition?: (x: number, y: number, detected: boolean) => void;
+  onPinchDetected?: (pinching: boolean) => void;
+  onSwipe?: (deltaX: number) => void;
 }
 
 export const GestureController: React.FC<GestureControllerProps> = ({
@@ -16,6 +19,9 @@ export const GestureController: React.FC<GestureControllerProps> = ({
   onHandPosition,
   onTwoHandsDetected,
   onPeaceGestureDetected,
+  onIndexFingerPosition,
+  onPinchDetected,
+  onSwipe,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -29,6 +35,12 @@ export const GestureController: React.FC<GestureControllerProps> = ({
   const closedFrames = useRef(0);
   const peaceFrames = useRef(0);
   const CONFIDENCE_THRESHOLD = 5; // Number of consecutive frames to confirm gesture
+
+  // Index finger tracking for swipe detection
+  const lastIndexXRef = useRef<number | null>(null);
+  const pinchActiveRef = useRef(false);
+  const PINCH_THRESHOLD = 0.06; // Normalized distance threshold for pinch
+  const SWIPE_THRESHOLD = 0.015; // Minimum delta to register as swipe
 
   useEffect(() => {
     let handLandmarker: HandLandmarker | null = null;
@@ -208,6 +220,14 @@ export const GestureController: React.FC<GestureControllerProps> = ({
           if (onTwoHandsDetected) {
             onTwoHandsDetected(false);
           }
+          if (onIndexFingerPosition) {
+            onIndexFingerPosition(0.5, 0.5, false);
+          }
+          if (onPinchDetected && pinchActiveRef.current) {
+            pinchActiveRef.current = false;
+            onPinchDetected(false);
+          }
+          lastIndexXRef.current = null;
           // Clear canvas when no hand detected
           if (canvasRef.current) {
             const ctx = canvasRef.current.getContext("2d");
@@ -260,6 +280,36 @@ export const GestureController: React.FC<GestureControllerProps> = ({
       if (onHandPosition) {
         onHandPosition(palmCenterX, palmCenterY, true);
       }
+
+      // --- Index finger tip position (landmark 8) ---
+      const indexTip = landmarks[8];
+      if (onIndexFingerPosition) {
+        onIndexFingerPosition(indexTip.x, indexTip.y, true);
+      }
+
+      // --- Pinch detection: thumb tip (4) to index tip (8) distance ---
+      const thumbTipLm = landmarks[4];
+      const indexTipLm = landmarks[8];
+      const pinchDist = Math.hypot(
+        thumbTipLm.x - indexTipLm.x,
+        thumbTipLm.y - indexTipLm.y,
+      );
+      const isPinching = pinchDist < PINCH_THRESHOLD;
+      if (isPinching !== pinchActiveRef.current) {
+        pinchActiveRef.current = isPinching;
+        if (onPinchDetected) {
+          onPinchDetected(isPinching);
+        }
+      }
+
+      // --- Horizontal swipe detection based on index finger X movement ---
+      if (lastIndexXRef.current !== null && onSwipe) {
+        const deltaX = indexTip.x - lastIndexXRef.current;
+        if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
+          onSwipe(deltaX);
+        }
+      }
+      lastIndexXRef.current = indexTip.x;
 
       const fingerTips = [8, 12, 16, 20];
       const fingerBases = [5, 9, 13, 17];
@@ -328,7 +378,13 @@ export const GestureController: React.FC<GestureControllerProps> = ({
       })();
 
       // DECISION
-      if (extendedFingers >= 4) {
+      // When pinching, skip mode-change gestures so pinch doesn't trigger fist/open
+      if (isPinching) {
+        setGestureStatus("Detected: PINCH");
+        openFrames.current = 0;
+        closedFrames.current = 0;
+        peaceFrames.current = 0;
+      } else if (extendedFingers >= 4) {
         // OPEN HAND -> UNLEASH (CHAOS)
         openFrames.current++;
         closedFrames.current = 0;

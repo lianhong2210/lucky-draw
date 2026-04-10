@@ -7,12 +7,13 @@ import {
   Noise,
 } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { Foliage } from "./Foliage";
 import { LogoOrnaments } from "./Ornaments";
 import { Polaroids } from "./Polaroids";
 import { LuckyBalls3D } from "./LuckyBalls";
 import { TreeMode } from "../types";
+import * as THREE from "three";
 
 interface ExperienceProps {
   mode: TreeMode;
@@ -24,6 +25,9 @@ interface ExperienceProps {
   luckyBallsActive: boolean;
   onLuckyPhotoSelected: (photoUrl: string | null) => void;
   onLuckyBallsDone: () => void;
+  indexFingerPos: { x: number; y: number; detected: boolean };
+  isPinching: boolean;
+  orbitOffsetRef: React.RefObject<number>;
 }
 
 export const Experience: React.FC<ExperienceProps> = ({
@@ -36,58 +40,26 @@ export const Experience: React.FC<ExperienceProps> = ({
   luckyBallsActive,
   onLuckyPhotoSelected,
   onLuckyBallsDone,
+  indexFingerPos,
+  isPinching,
+  orbitOffsetRef,
 }) => {
   const controlsRef = useRef<any>(null);
+  const raycaster = useRef(new THREE.Raycaster());
+  const fingerRayOrigin = useRef(new THREE.Vector3());
+  const fingerRayDir = useRef(new THREE.Vector3());
 
-  // Update camera rotation based on hand position
-  useFrame((_, delta) => {
-    if (controlsRef.current && handPosition.detected) {
-      const controls = controlsRef.current;
-
-      // Map hand position to spherical coordinates
-      // x: 0 (left) to 1 (right) -> azimuthal angle (horizontal rotation)
-      // y: 0 (top) to 1 (bottom) -> polar angle (vertical tilt)
-
-      // Target azimuthal angle: increased range for larger rotation
-      const targetAzimuth = (handPosition.x - 0.5) * Math.PI * 3; // Increased from 2 to 3
-
-      // Adjust Y mapping so natural hand position gives best view
-      // Offset Y so hand at 0.4-0.5 range gives centered view
-      const adjustedY = (handPosition.y - 0.2) * 2.0; // Increased sensitivity from 1.5 to 2.0
-      const clampedY = Math.max(0, Math.min(1, adjustedY)); // Clamp to 0-1
-
-      // Target polar angle: PI/4 to PI/1.8 (constrained vertical angle)
-      const minPolar = Math.PI / 4;
-      const maxPolar = Math.PI / 1.8;
-      const targetPolar = minPolar + clampedY * (maxPolar - minPolar);
-
-      // Get current angles
-      const currentAzimuth = controls.getAzimuthalAngle();
-      const currentPolar = controls.getPolarAngle();
-
-      // Calculate angle differences (handle wrapping for azimuth)
-      let azimuthDiff = targetAzimuth - currentAzimuth;
-      if (azimuthDiff > Math.PI) azimuthDiff -= Math.PI * 2;
-      if (azimuthDiff < -Math.PI) azimuthDiff += Math.PI * 2;
-
-      // Smoothly interpolate angles
-      const lerpSpeed = 8; // Increased from 5 to 8 for faster response
-      const newAzimuth = currentAzimuth + azimuthDiff * delta * lerpSpeed;
-      const newPolar =
-        currentPolar + (targetPolar - currentPolar) * delta * lerpSpeed;
-
-      // Calculate new camera position in spherical coordinates
-      const radius = controls.getDistance();
-      const targetY = 4; // Tree center height
-
-      const x = radius * Math.sin(newPolar) * Math.sin(newAzimuth);
-      const y = targetY + radius * Math.cos(newPolar);
-      const z = radius * Math.sin(newPolar) * Math.cos(newAzimuth);
-
-      // Update camera position and target
-      controls.object.position.set(x, y, z);
-      controls.target.set(0, targetY, 0);
-      controls.update();
+  // Update finger raycaster only - camera stays fixed
+  useFrame(() => {
+    const camera = controlsRef.current?.object;
+    if (camera && indexFingerPos.detected) {
+      // Convert mirrored finger position to NDC (-1 to 1)
+      const ndcX = (1 - indexFingerPos.x - 0.5) * 2;
+      const ndcY = -(indexFingerPos.y - 0.5) * 2;
+      const ndc = new THREE.Vector2(ndcX, ndcY);
+      raycaster.current.setFromCamera(ndc, camera);
+      fingerRayOrigin.current.copy(raycaster.current.ray.origin);
+      fingerRayDir.current.copy(raycaster.current.ray.direction);
     }
   });
   return (
@@ -134,6 +106,11 @@ export const Experience: React.FC<ExperienceProps> = ({
           uploadedPhotos={uploadedPhotos}
           onPhotoSelected={onLuckyPhotoSelected}
           onDone={onLuckyBallsDone}
+          fingerRayOrigin={fingerRayOrigin}
+          fingerRayDir={fingerRayDir}
+          fingerDetected={indexFingerPos.detected}
+          isPinching={isPinching}
+          orbitOffsetRef={orbitOffsetRef}
         />
 
         {/* Floor Reflections */}
