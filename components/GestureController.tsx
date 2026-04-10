@@ -61,7 +61,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
             delegate: "GPU",
           },
           runningMode: "VIDEO",
-          numHands: 2,
+          numHands: 1,
         });
 
         startWebcam();
