@@ -23,6 +23,7 @@ interface ExperienceProps {
   peaceGestureDetected: boolean;
   onClosestPhotoChange?: (photoUrl: string | null) => void;
   luckyBallsActive: boolean;
+  luckyPhoto: string;
   onLuckyPhotoSelected: (photoUrl: string | null) => void;
   onLuckyBallsDone: () => void;
   indexFingerPos: { x: number; y: number; detected: boolean };
@@ -38,6 +39,7 @@ export const Experience: React.FC<ExperienceProps> = ({
   peaceGestureDetected,
   onClosestPhotoChange,
   luckyBallsActive,
+  luckyPhoto,
   onLuckyPhotoSelected,
   onLuckyBallsDone,
   indexFingerPos,
@@ -111,6 +113,7 @@ export const Experience: React.FC<ExperienceProps> = ({
           fingerDetected={indexFingerPos.detected}
           isPinching={isPinching}
           orbitOffsetRef={orbitOffsetRef}
+          luckyPhoto={luckyPhoto}
         />
 
         {/* Floor Reflections */}

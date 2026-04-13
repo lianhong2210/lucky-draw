@@ -229,6 +229,7 @@ export default function App() {
               peaceGestureDetected={peaceGestureDetected}
               onClosestPhotoChange={handleClosestPhotoChange}
               luckyBallsActive={luckyBallsActive}
+              luckyPhoto={luckyPhoto}
               onLuckyPhotoSelected={handleLuckyPhotoSelected}
               onLuckyBallsDone={handleLuckyBallsDone}
               indexFingerPos={indexFingerPos}
