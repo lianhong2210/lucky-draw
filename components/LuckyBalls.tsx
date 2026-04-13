@@ -1,9 +1,6 @@
 import React, {
   useRef,
-  useState,
   useEffect,
-  useCallback,
-  useMemo,
 } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
@@ -21,14 +18,43 @@ import * as THREE from "three";
  * - Auto-rotation when no swipe input
  */
 
-const BALL_COUNT = 20;
 const BALL_RADIUS = 0.8;
+
+const defaultPhotos = [
+  "/photos/balls/sample/1.png",
+  "/photos/balls/sample/2.png",
+  "/photos/balls/sample/3.png",
+  "/photos/balls/sample/4.png",
+  "/photos/balls/sample/5.png",
+  "/photos/balls/sample/6.png",
+  "/photos/balls/sample/7.png",
+  "/photos/balls/sample/8.png",
+  "/photos/balls/sample/9.png",
+  "/photos/balls/sample/10.png",
+
+  "/photos/balls/sample/1.png",
+  "/photos/balls/sample/2.png",
+  "/photos/balls/sample/3.png",
+  "/photos/balls/sample/4.png",
+  "/photos/balls/sample/5.png",
+  "/photos/balls/sample/6.png",
+  "/photos/balls/sample/7.png",
+  "/photos/balls/sample/8.png",
+  "/photos/balls/sample/9.png",
+  "/photos/balls/sample/10.png",
+
+  "/photos/balls/sample/1.png",
+  "/photos/balls/sample/2.png",
+]
 
 // Distribute balls across 2 orbit rings at different heights
 const ORBIT_RINGS = [
   { y: 3, radius: 6.5, count: 10, speed: 0.15 }, // Lower ring - wider
   { y: 7, radius: 5.0, count: 10, speed: -0.12 }, // Upper ring - tighter, opposite dir
 ];
+const BALL_COUNT = ORBIT_RINGS.reduce((acc, cur)=> {
+  return acc += cur.count;
+},0);
 
 const BALL_COLORS = [
   "#FF4444",
@@ -82,9 +108,10 @@ interface BallState {
   ringIndex: number;
   indexInRing: number;
   phase: BallPhase;
-  imageUrl: string | null;
+  // imageUrl: string | null;
   color: string;
   emissive: string;
+  // globalIndex: number;
 }
 
 interface LuckyBalls3DProps {
@@ -99,6 +126,7 @@ interface LuckyBalls3DProps {
   fingerDetected: boolean;
   isPinching: boolean;
   orbitOffsetRef: React.RefObject<number>;
+  luckyPhoto: string;
 }
 
 export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
@@ -113,56 +141,56 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   fingerDetected,
   isPinching,
   orbitOffsetRef,
+  luckyPhoto
 }) => {
+  const photos = useRef<string[]>(defaultPhotos)
+  const ballStates = useRef<BallState[]>([])
+  const readyToNextBatchRef = useRef(false);
   const groupRef = useRef<THREE.Group>(null);
-  const ballRefs = useRef<(THREE.Mesh | null)[]>(
-    new Array(BALL_COUNT).fill(null),
-  );
-  const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
+  const ballRefs = useRef<(THREE.Mesh | null)[]>([]);
   const highlightedRef = useRef(-1);
-  const [pickedIndex, setPickedIndex] = useState<number>(-1);
   const pickedRef = useRef(-1);
   const explodeStartRef = useRef(0);
-  const ballPhasesRef = useRef<BallPhase[]>(
-    new Array(BALL_COUNT).fill("ORBITING"),
-  );
-  const [phase, setPhase] = useState<"IDLE" | "ACTIVE" | "EXPLODING" | "DONE">(
-    "IDLE",
-  );
   const phaseRef = useRef<"IDLE" | "ACTIVE" | "EXPLODING" | "DONE">("IDLE");
   const hasTriggeredRef = useRef(false);
   const autoRotationRef = useRef(0);
   const pinchCooldownRef = useRef(0);
 
-  // Assign images to balls
-  const ballStates = useMemo<BallState[]>(() => {
-    const states: BallState[] = [];
-    let globalIndex = 0;
+  const getBallCountWithBatch = () => {
+    return photos.current.length >= BALL_COUNT ? BALL_COUNT : photos.current.length
+  }
+
+  const assignBallPosition = () => {
+    const maxLength = getBallCountWithBatch();
+
+    if (maxLength < BALL_COUNT){
+      return;
+    }
+
+    // Reset ball states and ring positions
+    let currentBallIndex = 0;
     for (let ringIdx = 0; ringIdx < ORBIT_RINGS.length; ringIdx++) {
       const ring = ORBIT_RINGS[ringIdx];
       for (let i = 0; i < ring.count; i++) {
-        const imageUrl =
-          uploadedPhotos.length > 0
-            ? uploadedPhotos[globalIndex % uploadedPhotos.length]
-            : null;
-        states.push({
-          ringIndex: ringIdx,
-          indexInRing: i,
+        if (currentBallIndex >= maxLength){
+          break;
+        }
+        ballStates.current[currentBallIndex] = {
           phase: "ORBITING",
-          imageUrl,
-          color: BALL_COLORS[globalIndex % BALL_COLORS.length],
-          emissive: BALL_EMISSIVE[globalIndex % BALL_EMISSIVE.length],
-        });
-        globalIndex++;
+          color: BALL_COLORS[currentBallIndex % BALL_COLORS.length],
+          emissive: BALL_EMISSIVE[currentBallIndex % BALL_EMISSIVE.length],
+          ringIndex: ringIdx,
+          indexInRing: i
+        }
+        currentBallIndex++;
       }
     }
-    return states;
-  }, [uploadedPhotos]);
+  }
 
   // Compute ball world position given time and orbit offset
-  const getBallPosition = useCallback(
+  const getBallPosition = 
     (ballIndex: number, time: number, orbitOffset: number): THREE.Vector3 => {
-      const state = ballStates[ballIndex];
+      const state = ballStates.current[ballIndex];
       if (!state) return new THREE.Vector3();
       const ring = ORBIT_RINGS[state.ringIndex];
       const angleStep = (Math.PI * 2) / ring.count;
@@ -172,51 +200,49 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
       const z = ring.radius * Math.sin(angle);
       const y = ring.y + Math.sin(time * 1.5 + state.indexInRing * 0.8) * 0.3;
       return new THREE.Vector3(x, y, z);
-    },
-    [ballStates],
-  );
+    }
 
   // Start when activated
   useEffect(() => {
     if (active && phaseRef.current === "IDLE" && !hasTriggeredRef.current) {
       hasTriggeredRef.current = true;
       phaseRef.current = "ACTIVE";
-      setPhase("ACTIVE");
-      ballPhasesRef.current = new Array(BALL_COUNT).fill("ORBITING");
+      assignBallPosition();
     }
   }, [active]);
 
-  const cleanup = useCallback(() => {
-    phaseRef.current = "IDLE";
-    setPhase("IDLE");
-    setHighlightedIndex(-1);
+  // const cleanup = useCallback(() => {
+  //   phaseRef.current = "IDLE";
+  //   highlightedRef.current = -1;
+  //   pickedRef.current = -1;
+  //   hasTriggeredRef.current = false;
+  // }, []);
+
+  const nextBatch = () => {
     highlightedRef.current = -1;
-    setPickedIndex(-1);
     pickedRef.current = -1;
     hasTriggeredRef.current = false;
-    ballPhasesRef.current = new Array(BALL_COUNT).fill("ORBITING");
-  }, []);
+    assignBallPosition();
+  }
 
-  // Handle pinch to pick
-  useEffect(() => {
+  useFrame((state) => {
     if (
       isPinching &&
+      !luckyPhoto &&
       highlightedRef.current >= 0 &&
       phaseRef.current === "ACTIVE" &&
       pickedRef.current < 0 &&
       pinchCooldownRef.current <= 0
     ) {
+      const ballCount = getBallCountWithBatch();
+      if (ballCount === 0) return;
       const idx = highlightedRef.current;
-      if (ballPhasesRef.current[idx] === "ORBITING") {
+      if (ballStates.current[idx].phase === "ORBITING") {
         pickedRef.current = idx;
-        setPickedIndex(idx);
-        ballPhasesRef.current[idx] = "PICKED";
-        pinchCooldownRef.current = 2; // 2 second cooldown
+        ballStates.current[idx].phase = "PICKED";
+        pinchCooldownRef.current = 0.02; // 2 second cooldown
       }
     }
-  }, [isPinching]);
-
-  useFrame((state) => {
     const t = state.clock.elapsedTime;
     const delta = state.clock.getDelta() || 0.016;
 
@@ -240,8 +266,11 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
       const rayOrigin = fingerRayOrigin.current;
       const rayDir = fingerRayDir.current;
 
-      for (let i = 0; i < BALL_COUNT; i++) {
-        if (ballPhasesRef.current[i] !== "ORBITING") continue;
+      const ballCountWithBatch = getBallCountWithBatch();
+      if (ballCountWithBatch === 0) return;
+
+      for (let i = 0; i < ballCountWithBatch; i++) {
+        if (ballStates.current[i].phase !== "ORBITING") continue;
 
         const mesh = ballRefs.current[i];
         if (!mesh) continue;
@@ -269,15 +298,32 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
 
     if (closestIdx !== highlightedRef.current) {
       highlightedRef.current = closestIdx;
-      setHighlightedIndex(closestIdx);
+    }
+
+    if (luckyPhoto && !readyToNextBatchRef.current){
+      readyToNextBatchRef.current = true;
+    } 
+    if (!luckyPhoto && readyToNextBatchRef.current){
+      readyToNextBatchRef.current = false;
+      nextBatch();
     }
 
     // --- Update each ball ---
-    for (let i = 0; i < BALL_COUNT; i++) {
+    const ballCountWithBatch = getBallCountWithBatch();
+    if (ballCountWithBatch === 0) return;
+
+    for (let i = 0; i < BALL_COUNT; i++) {      
+      if (!ballStates.current[i]) break;
+
       const mesh = ballRefs.current[i];
       if (!mesh) continue;
+
       const mat = mesh.material as THREE.MeshStandardMaterial;
-      const ballPhase = ballPhasesRef.current[i];
+      const ballPhase = ballStates.current[i].phase;
+
+      if (ballPhase !== "GONE") {
+        mesh.visible = true;
+      }
 
       if (ballPhase === "ORBITING") {
         // Move to orbit position
@@ -304,7 +350,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
             0.3,
             0.1,
           );
-          mat.emissive.set(ballStates[i].emissive); // restore original emissive
+          mat.emissive.set(ballStates.current[i].emissive); // restore original emissive
           mat.roughness = 0.15;
         }
         mat.opacity = 1;
@@ -323,10 +369,9 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
 
         // After reaching target scale, start exploding
         if (mesh.scale.x > 2.3) {
-          ballPhasesRef.current[i] = "EXPLODING";
+          ballStates.current[i].phase = "EXPLODING";
           explodeStartRef.current = t;
           phaseRef.current = "EXPLODING";
-          setPhase("EXPLODING");
         }
       } else if (ballPhase === "EXPLODING") {
         const elapsed = t - explodeStartRef.current;
@@ -337,24 +382,23 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
         mat.emissiveIntensity = 5 + progress * 10;
 
         if (progress >= 1) {
-          ballPhasesRef.current[i] = "GONE";
+          ballStates.current[i].phase = "GONE";
           mesh.visible = false;
 
-          // Fire photo callback
-          const ballState = ballStates[i];
-          if (ballState?.imageUrl) {
-            onPhotoSelected(ballState.imageUrl);
+          // Fire random photo callback
+          const randomIndex = Math.floor(Math.random() * photos.current.length);
+          const imageUrl = photos.current.splice(randomIndex,1)
+
+          if (imageUrl?.[0]) {
+            onPhotoSelected(imageUrl[0]);
           } else {
             onPhotoSelected(null);
           }
 
           // Reset back to ACTIVE so more balls can be picked
           pickedRef.current = -1;
-          setPickedIndex(-1);
           highlightedRef.current = -1;
-          setHighlightedIndex(-1);
           phaseRef.current = "ACTIVE";
-          setPhase("ACTIVE");
         }
       } else if (ballPhase === "GONE") {
         mesh.visible = false;
@@ -362,7 +406,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
     }
   });
 
-  if (phaseRef.current === "IDLE" || phase === "IDLE") {
+  if (phaseRef.current === "IDLE") {
     return null;
   }
 
@@ -389,8 +433,8 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
         decay={1.5}
       />
 
-      {/* 20 Orbit Balls */}
-      {ballStates.map((bs, i) => (
+      {/* Orbit Balls */}
+      {ballStates.current.map((bs, i) => (
         <mesh
           key={i}
           ref={(el) => {
