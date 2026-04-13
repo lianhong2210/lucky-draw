@@ -39,7 +39,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
   // Index finger tracking for swipe detection
   const lastIndexXRef = useRef<number | null>(null);
   const pinchActiveRef = useRef(false);
-  const PINCH_THRESHOLD = 0.06; // Normalized distance threshold for pinch
+  const PINCH_THRESHOLD = 0.03; // Normalized distance threshold for pinch
   const SWIPE_THRESHOLD = 0.015; // Minimum delta to register as swipe
 
   useEffect(() => {
@@ -303,9 +303,11 @@ export const GestureController: React.FC<GestureControllerProps> = ({
       }
 
       // --- Horizontal swipe detection based on index finger X movement ---
+      // Only allow right-to-left swipes (negative deltaX)
       if (lastIndexXRef.current !== null && onSwipe) {
         const deltaX = indexTip.x - lastIndexXRef.current;
-        if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
+        // Right-to-left swipe: deltaX is negative (finger moving left)
+        if (deltaX > SWIPE_THRESHOLD) {
           onSwipe(deltaX);
         }
       }

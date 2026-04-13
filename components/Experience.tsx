@@ -79,7 +79,7 @@ export const Experience: React.FC<ExperienceProps> = ({
       />
 
       {/* Lighting Setup for Maximum Luxury */}
-      <Environment preset="lobby" background={false} blur={0.8} />
+      <Environment preset="dawn" background={false} blur={0.8} />
 
       <ambientLight intensity={0.2} color="#004422" />
       <spotLight

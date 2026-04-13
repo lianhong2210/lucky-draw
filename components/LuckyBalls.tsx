@@ -52,9 +52,7 @@ const ORBIT_RINGS = [
   { y: 3, radius: 6.5, count: 10, speed: 0.15 }, // Lower ring - wider
   { y: 7, radius: 5.0, count: 10, speed: -0.12 }, // Upper ring - tighter, opposite dir
 ];
-const BALL_COUNT = ORBIT_RINGS.reduce((acc, cur)=> {
-  return acc += cur.count;
-},0);
+const BALL_COUNT = ORBIT_RINGS.reduce((acc, cur) => (acc += cur.count), 0);
 
 const BALL_COLORS = [
   "#FF4444",
