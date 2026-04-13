@@ -201,11 +201,11 @@ export default function App() {
 
   // Close lucky photo overlay when hands are hidden
   useEffect(() => {
-    if (luckyPhoto && !peaceGestureDetected) {
+    if (luckyPhoto && !handPosition?.detected) {
       setLuckyPhoto(null);
       setLuckyBallsActive(false);
     }
-  }, [peaceGestureDetected, luckyPhoto]);
+  }, [luckyPhoto, handPosition?.detected]);
 
   const handlePhotosUpload = (photos: string[]) => {
     setUploadedPhotos(photos);
