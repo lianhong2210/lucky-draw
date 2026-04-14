@@ -75,6 +75,7 @@ export default function App() {
     name: string;
     imageUrl: string;
   } | null>(null);
+  const [pickedNames, setPickedNames] = useState<string[]>([]);
 
   // New state for finger pointer, pinch, swipe
   const [indexFingerPos, setIndexFingerPos] = useState<{
@@ -207,6 +208,9 @@ export default function App() {
     photo: { name: string; imageUrl: string } | null,
   ) => {
     setLuckyPhoto(photo);
+    if (photo) {
+      setPickedNames((prev) => [...prev, photo.name]);
+    }
   };
 
   const handleLuckyBallsDone = () => {
@@ -297,6 +301,7 @@ export default function App() {
         hasPhotos={uploadedPhotos.length > 0}
         uploadedPhotos={uploadedPhotos}
         isSharedView={isSharedView}
+        pickedNames={pickedNames}
       />
 
       {/* Loading indicator for shared photos */}

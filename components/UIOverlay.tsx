@@ -8,6 +8,7 @@ interface UIOverlayProps {
   hasPhotos: boolean;
   uploadedPhotos: string[];
   isSharedView: boolean;
+  pickedNames: string[];
 }
 
 export const UIOverlay: React.FC<UIOverlayProps> = ({
@@ -17,6 +18,7 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({
   hasPhotos,
   uploadedPhotos,
   isSharedView,
+  pickedNames,
 }) => {
   const isFormed = mode === TreeMode.FORMED;
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -235,6 +237,28 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({
 
   return (
     <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-10">
+      {/* Picked Names List - Left Side */}
+      {pickedNames.length > 0 && (
+        <div className="absolute top-24 left-8 flex flex-col gap-2 pointer-events-none max-h-[70vh] overflow-y-auto">
+          <h2 className="text-lg font-serif text-[#D4AF37] tracking-wider mb-1 drop-shadow-lg">
+            Picked
+          </h2>
+          {pickedNames.map((name, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-2 px-3 py-1.5 bg-black/60 backdrop-blur-sm border border-[#D4AF37]/40 rounded-sm animate-fade-in"
+            >
+              <span className="text-[#D4AF37] font-serif text-sm font-bold min-w-[20px]">
+                {i + 1}.
+              </span>
+              <span className="text-[#F5E6BF] font-serif text-sm tracking-wide">
+                {name}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Header */}
       <header className="absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
         <h1 className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#F5E6BF] to-[#D4AF37] font-serif drop-shadow-lg tracking-wider text-center">
