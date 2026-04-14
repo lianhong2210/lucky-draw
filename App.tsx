@@ -362,7 +362,7 @@ export default function App() {
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-6 bg-gradient-to-b from-[#D4AF37] to-[#C5A028] rounded-sm shadow-lg"></div>
               <img
                 src={luckyPhoto.imageUrl}
-                alt="Lucky Memory"
+                alt={luckyPhoto.name}
                 className="w-full aspect-square object-cover"
               />
               <div className="text-center mt-4 font-serif text-gray-700 text-lg">
