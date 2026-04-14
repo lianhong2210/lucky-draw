@@ -1,4 +1,10 @@
-import React, { useState, Suspense, useEffect, useRef } from "react";
+import React, {
+  useState,
+  Suspense,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 import { Canvas } from "@react-three/fiber";
 import { Loader } from "@react-three/drei";
 import { Experience } from "./components/Experience";
@@ -201,13 +207,41 @@ export default function App() {
     setLuckyPhoto(null);
   };
 
-  // Close lucky photo overlay when hands are hidden
+  // Ref for the close button to detect pinch-over-button
+  const closeButtonRef = useRef<HTMLDivElement>(null);
+
+  // Close lucky photo when user pinches on the close button
+  const handleCloseLuckyPhoto = useCallback(() => {
+    setLuckyPhoto(null);
+    setLuckyBallsActive(false);
+  }, []);
+
+  // Detect pinch gesture over the close button
   useEffect(() => {
-    if (luckyPhoto && !handPosition?.detected) {
-      setLuckyPhoto(null);
-      setLuckyBallsActive(false);
+    if (
+      !luckyPhoto ||
+      !isPinching ||
+      !indexFingerPos.detected ||
+      !closeButtonRef.current
+    )
+      return;
+
+    const btn = closeButtonRef.current.getBoundingClientRect();
+    // Convert finger pos (0-1 normalized, mirrored X) to screen pixels
+    const fingerX = (1 - indexFingerPos.x) * window.innerWidth;
+    const fingerY = indexFingerPos.y * window.innerHeight;
+
+    // Add generous hit area padding around the button
+    const padding = 30;
+    if (
+      fingerX >= btn.left - padding &&
+      fingerX <= btn.right + padding &&
+      fingerY >= btn.top - padding &&
+      fingerY <= btn.bottom + padding
+    ) {
+      handleCloseLuckyPhoto();
     }
-  }, [luckyPhoto, handPosition?.detected]);
+  }, [luckyPhoto, isPinching, indexFingerPos, handleCloseLuckyPhoto]);
 
   const handlePhotosUpload = (photos: string[]) => {
     setUploadedPhotos(photos);
@@ -280,7 +314,7 @@ export default function App() {
       {/* Finger Pointer Overlay - follows index finger */}
       {indexFingerPos.detected && (
         <div
-          className="fixed z-30 pointer-events-none"
+          className="fixed z-[60] pointer-events-none"
           style={{
             left: `${(1 - indexFingerPos.x) * 100}%`,
             top: `${indexFingerPos.y * 100}%`,
@@ -322,8 +356,28 @@ export default function App() {
                 Lucky Memory
               </div>
             </div>
-            <div className="text-center mt-6 text-[#D4AF37] font-serif text-sm tracking-wider animate-pulse">
-              Hide both hands to close
+            <div
+              ref={closeButtonRef}
+              onClick={handleCloseLuckyPhoto}
+              className="mt-6 mx-auto flex items-center justify-center gap-2 px-8 py-3 rounded-full border-2 border-[#D4AF37] bg-black/60 backdrop-blur-sm cursor-pointer pointer-events-auto transition-all duration-200 hover:bg-[#D4AF37] hover:text-black group"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 text-[#D4AF37] group-hover:text-black transition-colors"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+              <span className="text-[#D4AF37] font-serif text-sm tracking-wider group-hover:text-black transition-colors">
+                Pinch here to close
+              </span>
             </div>
           </div>
         </div>

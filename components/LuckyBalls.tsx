@@ -303,6 +303,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
     }
     if (!luckyPhoto && readyToNextBatchRef.current) {
       readyToNextBatchRef.current = false;
+      pinchCooldownRef.current = 1.0; // prevent the close-pinch from picking a ball
       nextBatch();
     }
 
