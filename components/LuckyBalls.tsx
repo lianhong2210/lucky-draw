@@ -352,17 +352,17 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
       if (ballPhase === "ORBITING") {
         // Move to orbit position
         const targetPos = getBallPosition(i, t, orbitOffset);
-        mesh.position.lerp(targetPos, 0.1);
+        mesh.position.lerp(targetPos, 0.3);
         mesh.rotation.y = t * 0.5 + i;
 
         // Highlight effect - strong glow + scale pulse when pointed at
         const isHighlighted = i === highlightedRef.current;
         if (isHighlighted) {
-          const pulse = 1.6 + Math.sin(t * 6) * 0.2; // pulsing scale
+          const pulse = 1 + Math.sin(t * 6) * 0.2; // pulsing scale
           mesh.scale.setScalar(THREE.MathUtils.lerp(mesh.scale.x, pulse, 0.2));
           mat.emissiveIntensity = THREE.MathUtils.lerp(
             mat.emissiveIntensity,
-            6.0,
+            1.0,
             0.2,
           );
           mat.emissive.set("#FFFFFF"); // bright white glow
