@@ -71,7 +71,10 @@ export default function App() {
   const [closestPhoto, setClosestPhoto] = useState<string | null>(null);
   const [luckyBallsActive, setLuckyBallsActive] = useState(false);
   const [luckyBallsReady, setLuckyBallsReady] = useState(false);
-  const [luckyPhoto, setLuckyPhoto] = useState<string | null>(null);
+  const [luckyPhoto, setLuckyPhoto] = useState<{
+    name: string;
+    imageUrl: string;
+  } | null>(null);
 
   // New state for finger pointer, pinch, swipe
   const [indexFingerPos, setIndexFingerPos] = useState<{
@@ -200,8 +203,10 @@ export default function App() {
     setLuckyPhoto(null);
   };
 
-  const handleLuckyPhotoSelected = (photoUrl: string | null) => {
-    setLuckyPhoto(photoUrl);
+  const handleLuckyPhotoSelected = (
+    photo: { name: string; imageUrl: string } | null,
+  ) => {
+    setLuckyPhoto(photo);
   };
 
   const handleLuckyBallsDone = () => {
@@ -351,12 +356,12 @@ export default function App() {
             >
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-6 bg-gradient-to-b from-[#D4AF37] to-[#C5A028] rounded-sm shadow-lg"></div>
               <img
-                src={luckyPhoto}
+                src={luckyPhoto.imageUrl}
                 alt="Lucky Memory"
                 className="w-full aspect-square object-cover"
               />
               <div className="text-center mt-4 font-serif text-gray-700 text-lg">
-                Lucky Memory
+                {luckyPhoto.name}
               </div>
             </div>
             <div

@@ -22,8 +22,10 @@ interface ExperienceProps {
   twoHandsDetected: boolean;
   onClosestPhotoChange?: (photoUrl: string | null) => void;
   luckyBallsActive: boolean;
-  luckyPhoto: string;
-  onLuckyPhotoSelected: (photoUrl: string | null) => void;
+  luckyPhoto: { name: string; imageUrl: string };
+  onLuckyPhotoSelected: (
+    photo: { name: string; imageUrl: string } | null,
+  ) => void;
   onLuckyBallsDone: () => void;
   indexFingerPos: { x: number; y: number; detected: boolean };
   isPinching: boolean;

@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import PhotoListing from "../src/listing/sample.json";
 
 /**
  * OrbitBalls (LuckyBalls3D) - 20 metallic 3D spheres orbiting the tree
@@ -16,33 +17,6 @@ import * as THREE from "three";
  */
 
 const BALL_RADIUS = 0.8;
-
-const defaultPhotos = [
-  "/photos/balls/sample/1.png",
-  "/photos/balls/sample/2.png",
-  "/photos/balls/sample/3.png",
-  "/photos/balls/sample/4.png",
-  "/photos/balls/sample/5.png",
-  "/photos/balls/sample/6.png",
-  "/photos/balls/sample/7.png",
-  "/photos/balls/sample/8.png",
-  "/photos/balls/sample/9.png",
-  "/photos/balls/sample/10.png",
-
-  "/photos/balls/sample/1.png",
-  "/photos/balls/sample/2.png",
-  "/photos/balls/sample/3.png",
-  "/photos/balls/sample/4.png",
-  "/photos/balls/sample/5.png",
-  "/photos/balls/sample/6.png",
-  "/photos/balls/sample/7.png",
-  "/photos/balls/sample/8.png",
-  "/photos/balls/sample/9.png",
-  "/photos/balls/sample/10.png",
-
-  "/photos/balls/sample/1.png",
-  "/photos/balls/sample/2.png",
-];
 
 // Distribute balls across 2 orbit rings at different heights
 const ORBIT_RINGS = [
@@ -113,7 +87,7 @@ interface LuckyBalls3DProps {
   active: boolean;
   twoHandsDetected: boolean;
   uploadedPhotos: string[];
-  onPhotoSelected: (photoUrl: string | null) => void;
+  onPhotoSelected: (photo: { name: string; imageUrl: string } | null) => void;
   onDone: () => void;
   fingerRayOrigin: React.RefObject<THREE.Vector3>;
   fingerRayDir: React.RefObject<THREE.Vector3>;
@@ -121,7 +95,7 @@ interface LuckyBalls3DProps {
   isPinching: boolean;
   isPinchingRef: React.RefObject<boolean>;
   orbitOffsetRef: React.RefObject<number>;
-  luckyPhoto: string;
+  luckyPhoto: { name: string; imageUrl: string };
 }
 
 export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
@@ -138,8 +112,8 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   orbitOffsetRef,
   luckyPhoto,
 }) => {
-  const photos = useRef<string[]>(defaultPhotos);
-  const pickedPhotos = useRef<string[]>([]);
+  const photos = useRef<{ name: string; imageUrl: string }[]>(PhotoListing);
+  const pickedPhotos = useRef<{ name: string; imageUrl: string }[]>([]);
   const ballStates = useRef<BallState[]>([]);
   const readyToNextBatchRef = useRef(false);
   const groupRef = useRef<THREE.Group>(null);
