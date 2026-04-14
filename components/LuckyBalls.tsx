@@ -119,6 +119,7 @@ interface LuckyBalls3DProps {
   fingerRayDir: React.RefObject<THREE.Vector3>;
   fingerDetected: boolean;
   isPinching: boolean;
+  isPinchingRef: React.RefObject<boolean>;
   orbitOffsetRef: React.RefObject<number>;
   luckyPhoto: string;
 }
@@ -133,10 +134,12 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   fingerRayDir,
   fingerDetected,
   isPinching,
+  isPinchingRef,
   orbitOffsetRef,
   luckyPhoto,
 }) => {
   const photos = useRef<string[]>(defaultPhotos);
+  const pickedPhotos = useRef<string[]>([]);
   const ballStates = useRef<BallState[]>([]);
   const readyToNextBatchRef = useRef(false);
   const groupRef = useRef<THREE.Group>(null);
@@ -227,7 +230,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
 
   useFrame((state) => {
     if (
-      isPinching &&
+      isPinchingRef.current &&
       !luckyPhoto &&
       highlightedRef.current >= 0 &&
       phaseRef.current === "ACTIVE" &&
@@ -306,7 +309,26 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
     if (!luckyPhoto && readyToNextBatchRef.current) {
       readyToNextBatchRef.current = false;
       pinchCooldownRef.current = 1.0; // prevent the close-pinch from picking a ball
-      nextBatch();
+      // Don't reset all balls - just allow picking the next one
+      pickedRef.current = -1;
+      highlightedRef.current = -1;
+      phaseRef.current = "ACTIVE";
+
+      // Check if all balls in current batch are gone
+      const allGone =
+        ballStates.current.length > 0 &&
+        ballStates.current.every((bs) => bs.phase === "GONE");
+      if (allGone) {
+        // Filter out already picked photos
+        const remaining = photos.current.filter(
+          (p) => !pickedPhotos.current.includes(p),
+        );
+        if (remaining.length > 0) {
+          photos.current = remaining;
+          nextBatch();
+        }
+        // If no remaining photos, do nothing - all images have been picked
+      }
     }
 
     // --- Update each ball ---
@@ -388,10 +410,11 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
 
           // Fire random photo callback
           const randomIndex = Math.floor(Math.random() * photos.current.length);
-          const imageUrl = photos.current.splice(randomIndex, 1);
+          const imageUrl = photos.current[randomIndex];
 
-          if (imageUrl?.[0]) {
-            onPhotoSelected(imageUrl[0]);
+          if (imageUrl) {
+            pickedPhotos.current.push(imageUrl);
+            onPhotoSelected(imageUrl);
           } else {
             onPhotoSelected(null);
           }

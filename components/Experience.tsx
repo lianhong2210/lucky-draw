@@ -27,6 +27,7 @@ interface ExperienceProps {
   onLuckyBallsDone: () => void;
   indexFingerPos: { x: number; y: number; detected: boolean };
   isPinching: boolean;
+  isPinchingRef: React.RefObject<boolean>;
   orbitOffsetRef: React.RefObject<number>;
 }
 
@@ -42,6 +43,7 @@ export const Experience: React.FC<ExperienceProps> = ({
   onLuckyBallsDone,
   indexFingerPos,
   isPinching,
+  isPinchingRef,
   orbitOffsetRef,
 }) => {
   const controlsRef = useRef<any>(null);
@@ -109,6 +111,7 @@ export const Experience: React.FC<ExperienceProps> = ({
           fingerRayDir={fingerRayDir}
           fingerDetected={indexFingerPos.detected}
           isPinching={isPinching}
+          isPinchingRef={isPinchingRef}
           orbitOffsetRef={orbitOffsetRef}
           luckyPhoto={luckyPhoto}
         />

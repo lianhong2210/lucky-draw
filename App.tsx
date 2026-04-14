@@ -80,6 +80,7 @@ export default function App() {
     detected: boolean;
   }>({ x: 0.5, y: 0.5, detected: false });
   const [isPinching, setIsPinching] = useState(false);
+  const isPinchingRef = useRef(false);
 
   // Ref
   const orbitOffsetRef = useRef(0);
@@ -154,6 +155,7 @@ export default function App() {
   };
 
   const handlePinchDetected = (pinching: boolean) => {
+    isPinchingRef.current = pinching;
     setIsPinching(pinching);
   };
 
@@ -269,6 +271,7 @@ export default function App() {
               onLuckyBallsDone={handleLuckyBallsDone}
               indexFingerPos={indexFingerPos}
               isPinching={isPinching}
+              isPinchingRef={isPinchingRef}
               orbitOffsetRef={orbitOffsetRef}
             />
           </Suspense>
@@ -359,7 +362,7 @@ export default function App() {
             <div
               ref={closeButtonRef}
               onClick={handleCloseLuckyPhoto}
-              className="mt-6 mx-auto flex items-center justify-center gap-2 px-8 py-3 rounded-full border-2 border-[#D4AF37] bg-black/60 backdrop-blur-sm cursor-pointer pointer-events-auto transition-all duration-200 hover:bg-[#D4AF37] hover:text-black group"
+              className="absolute top-2 right-2 flex items-center justify-center w-10 h-10 rounded-full border-2 border-[#D4AF37] bg-black/60 backdrop-blur-sm cursor-pointer pointer-events-auto transition-all duration-200 hover:bg-[#D4AF37] hover:text-black group"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -375,9 +378,6 @@ export default function App() {
                   d="M6 18L18 6M6 6l12 12"
                 />
               </svg>
-              <span className="text-[#D4AF37] font-serif text-sm tracking-wider group-hover:text-black transition-colors">
-                Pinch here to close
-              </span>
             </div>
           </div>
         </div>
