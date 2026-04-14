@@ -278,11 +278,13 @@ export const GestureController: React.FC<GestureControllerProps> = ({
         onHandPosition(palmCenterX, palmCenterY, true);
       }
 
-      // --- Index finger tip position (landmark 8) ---
-      const indexTip = landmarks[8];
+      // --- Middle finger tip position (landmark 12) for cursor tracking ---
+      const middleTip = landmarks[12];
       if (onIndexFingerPosition) {
-        onIndexFingerPosition(indexTip.x, indexTip.y, true);
+        onIndexFingerPosition(middleTip.x, middleTip.y, true);
       }
+
+      const indexTip = landmarks[8];
 
       // --- Pinch detection: thumb tip (4) to index tip (8) distance ---
       const thumbTipLm = landmarks[4];
