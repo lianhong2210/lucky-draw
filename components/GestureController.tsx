@@ -7,7 +7,6 @@ interface GestureControllerProps {
   currentMode: TreeMode;
   onHandPosition?: (x: number, y: number, detected: boolean) => void;
   onTwoHandsDetected?: (detected: boolean) => void;
-  onPeaceGestureDetected?: (detected: boolean) => void;
   onIndexFingerPosition?: (x: number, y: number, detected: boolean) => void;
   onPinchDetected?: (pinching: boolean) => void;
   onSwipe?: (deltaX: number) => void;
@@ -18,7 +17,6 @@ export const GestureController: React.FC<GestureControllerProps> = ({
   currentMode,
   onHandPosition,
   onTwoHandsDetected,
-  onPeaceGestureDetected,
   onIndexFingerPosition,
   onPinchDetected,
   onSwipe,
@@ -33,7 +31,6 @@ export const GestureController: React.FC<GestureControllerProps> = ({
   // Debounce logic refs
   const openFrames = useRef(0);
   const closedFrames = useRef(0);
-  const peaceFrames = useRef(0);
   const CONFIDENCE_THRESHOLD = 5; // Number of consecutive frames to confirm gesture
 
   // Index finger tracking for swipe detection
@@ -346,51 +343,16 @@ export const GestureController: React.FC<GestureControllerProps> = ({
       );
       if (distThumbTip > distThumbBase * 1.2) extendedFingers++;
 
-      // Check for specific finger states for peace gesture detection
-      const indexExtended = (() => {
-        const tip = landmarks[8];
-        const base = landmarks[5];
-        const distTip = Math.hypot(tip.x - wrist.x, tip.y - wrist.y);
-        const distBase = Math.hypot(base.x - wrist.x, base.y - wrist.y);
-        return distTip > distBase * 1.5;
-      })();
-
-      const middleExtended = (() => {
-        const tip = landmarks[12];
-        const base = landmarks[9];
-        const distTip = Math.hypot(tip.x - wrist.x, tip.y - wrist.y);
-        const distBase = Math.hypot(base.x - wrist.x, base.y - wrist.y);
-        return distTip > distBase * 1.5;
-      })();
-
-      const ringExtended = (() => {
-        const tip = landmarks[16];
-        const base = landmarks[13];
-        const distTip = Math.hypot(tip.x - wrist.x, tip.y - wrist.y);
-        const distBase = Math.hypot(base.x - wrist.x, base.y - wrist.y);
-        return distTip > distBase * 1.5;
-      })();
-
-      const pinkyExtended = (() => {
-        const tip = landmarks[20];
-        const base = landmarks[17];
-        const distTip = Math.hypot(tip.x - wrist.x, tip.y - wrist.y);
-        const distBase = Math.hypot(base.x - wrist.x, base.y - wrist.y);
-        return distTip > distBase * 1.5;
-      })();
-
       // DECISION
       // When pinching, skip mode-change gestures so pinch doesn't trigger fist/open
       if (isPinching) {
         setGestureStatus("Detected: PINCH");
         openFrames.current = 0;
         closedFrames.current = 0;
-        peaceFrames.current = 0;
       } else if (extendedFingers >= 4) {
         // OPEN HAND -> UNLEASH (CHAOS)
         openFrames.current++;
         closedFrames.current = 0;
-        peaceFrames.current = 0;
 
         setGestureStatus("Detected: OPEN (Unleash)");
 
@@ -404,7 +366,6 @@ export const GestureController: React.FC<GestureControllerProps> = ({
         // CLOSED FIST -> RESTORE (FORMED)
         closedFrames.current++;
         openFrames.current = 0;
-        peaceFrames.current = 0;
 
         setGestureStatus("Detected: CLOSED (Restore)");
 
@@ -413,34 +374,6 @@ export const GestureController: React.FC<GestureControllerProps> = ({
             lastModeRef.current = TreeMode.FORMED;
             onModeChange(TreeMode.FORMED);
           }
-        }
-      } else if (
-        indexExtended &&
-        !middleExtended &&
-        !ringExtended &&
-        !pinkyExtended
-      ) {
-        // PEACE SIGN (✌️) - Index and middle extended, ring and pinky folded
-        peaceFrames.current++;
-        openFrames.current = 0;
-        closedFrames.current = 0;
-
-        setGestureStatus("Detected: PEACE (✌️)");
-
-        if (peaceFrames.current > CONFIDENCE_THRESHOLD) {
-          if (onPeaceGestureDetected) {
-            onPeaceGestureDetected(true);
-          }
-        }
-      } else {
-        // Ambiguous
-        setGestureStatus("Detected: ...");
-        openFrames.current = 0;
-        closedFrames.current = 0;
-        peaceFrames.current = 0;
-
-        if (onPeaceGestureDetected) {
-          onPeaceGestureDetected(false);
         }
       }
     };

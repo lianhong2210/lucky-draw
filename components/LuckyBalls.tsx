@@ -1,7 +1,4 @@
-import React, {
-  useRef,
-  useEffect,
-} from "react";
+import React, { useRef, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -45,12 +42,12 @@ const defaultPhotos = [
 
   "/photos/balls/sample/1.png",
   "/photos/balls/sample/2.png",
-]
+];
 
 // Distribute balls across 2 orbit rings at different heights
 const ORBIT_RINGS = [
-  { y: 3, radius: 6.5, count: 10, speed: 0.15 }, // Lower ring - wider
-  { y: 7, radius: 5.0, count: 10, speed: -0.12 }, // Upper ring - tighter, opposite dir
+  { y: 3, radius: 7.5, count: 10, speed: 0.15 }, // Lower ring - wider
+  { y: 7, radius: 6, count: 10, speed: -0.12 }, // Upper ring - tighter, opposite dir
 ];
 const BALL_COUNT = ORBIT_RINGS.reduce((acc, cur) => (acc += cur.count), 0);
 
@@ -115,7 +112,6 @@ interface BallState {
 interface LuckyBalls3DProps {
   active: boolean;
   twoHandsDetected: boolean;
-  peaceGestureDetected: boolean;
   uploadedPhotos: string[];
   onPhotoSelected: (photoUrl: string | null) => void;
   onDone: () => void;
@@ -130,7 +126,6 @@ interface LuckyBalls3DProps {
 export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   active,
   twoHandsDetected,
-  peaceGestureDetected,
   uploadedPhotos,
   onPhotoSelected,
   onDone,
@@ -139,10 +134,10 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   fingerDetected,
   isPinching,
   orbitOffsetRef,
-  luckyPhoto
+  luckyPhoto,
 }) => {
-  const photos = useRef<string[]>(defaultPhotos)
-  const ballStates = useRef<BallState[]>([])
+  const photos = useRef<string[]>(defaultPhotos);
+  const ballStates = useRef<BallState[]>([]);
   const readyToNextBatchRef = useRef(false);
   const groupRef = useRef<THREE.Group>(null);
   const ballRefs = useRef<(THREE.Mesh | null)[]>([]);
@@ -155,13 +150,15 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   const pinchCooldownRef = useRef(0);
 
   const getBallCountWithBatch = () => {
-    return photos.current.length >= BALL_COUNT ? BALL_COUNT : photos.current.length
-  }
+    return photos.current.length >= BALL_COUNT
+      ? BALL_COUNT
+      : photos.current.length;
+  };
 
   const assignBallPosition = () => {
     const maxLength = getBallCountWithBatch();
 
-    if (maxLength < BALL_COUNT){
+    if (maxLength < BALL_COUNT) {
       return;
     }
 
@@ -170,7 +167,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
     for (let ringIdx = 0; ringIdx < ORBIT_RINGS.length; ringIdx++) {
       const ring = ORBIT_RINGS[ringIdx];
       for (let i = 0; i < ring.count; i++) {
-        if (currentBallIndex >= maxLength){
+        if (currentBallIndex >= maxLength) {
           break;
         }
         ballStates.current[currentBallIndex] = {
@@ -178,27 +175,30 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
           color: BALL_COLORS[currentBallIndex % BALL_COLORS.length],
           emissive: BALL_EMISSIVE[currentBallIndex % BALL_EMISSIVE.length],
           ringIndex: ringIdx,
-          indexInRing: i
-        }
+          indexInRing: i,
+        };
         currentBallIndex++;
       }
     }
-  }
+  };
 
   // Compute ball world position given time and orbit offset
-  const getBallPosition = 
-    (ballIndex: number, time: number, orbitOffset: number): THREE.Vector3 => {
-      const state = ballStates.current[ballIndex];
-      if (!state) return new THREE.Vector3();
-      const ring = ORBIT_RINGS[state.ringIndex];
-      const angleStep = (Math.PI * 2) / ring.count;
-      const angle =
-        state.indexInRing * angleStep + time * ring.speed + orbitOffset;
-      const x = ring.radius * Math.cos(angle);
-      const z = ring.radius * Math.sin(angle);
-      const y = ring.y + Math.sin(time * 1.5 + state.indexInRing * 0.8) * 0.3;
-      return new THREE.Vector3(x, y, z);
-    }
+  const getBallPosition = (
+    ballIndex: number,
+    time: number,
+    orbitOffset: number,
+  ): THREE.Vector3 => {
+    const state = ballStates.current[ballIndex];
+    if (!state) return new THREE.Vector3();
+    const ring = ORBIT_RINGS[state.ringIndex];
+    const angleStep = (Math.PI * 2) / ring.count;
+    const angle =
+      state.indexInRing * angleStep + time * ring.speed + orbitOffset;
+    const x = ring.radius * Math.cos(angle);
+    const z = ring.radius * Math.sin(angle);
+    const y = ring.y + Math.sin(time * 1.5 + state.indexInRing * 0.8) * 0.3;
+    return new THREE.Vector3(x, y, z);
+  };
 
   // Start when activated
   useEffect(() => {
@@ -221,7 +221,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
     pickedRef.current = -1;
     hasTriggeredRef.current = false;
     assignBallPosition();
-  }
+  };
 
   useFrame((state) => {
     if (
@@ -298,10 +298,10 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
       highlightedRef.current = closestIdx;
     }
 
-    if (luckyPhoto && !readyToNextBatchRef.current){
+    if (luckyPhoto && !readyToNextBatchRef.current) {
       readyToNextBatchRef.current = true;
-    } 
-    if (!luckyPhoto && readyToNextBatchRef.current){
+    }
+    if (!luckyPhoto && readyToNextBatchRef.current) {
       readyToNextBatchRef.current = false;
       nextBatch();
     }
@@ -310,7 +310,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
     const ballCountWithBatch = getBallCountWithBatch();
     if (ballCountWithBatch === 0) return;
 
-    for (let i = 0; i < BALL_COUNT; i++) {      
+    for (let i = 0; i < BALL_COUNT; i++) {
       if (!ballStates.current[i]) break;
 
       const mesh = ballRefs.current[i];
@@ -385,7 +385,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
 
           // Fire random photo callback
           const randomIndex = Math.floor(Math.random() * photos.current.length);
-          const imageUrl = photos.current.splice(randomIndex,1)
+          const imageUrl = photos.current.splice(randomIndex, 1);
 
           if (imageUrl?.[0]) {
             onPhotoSelected(imageUrl[0]);

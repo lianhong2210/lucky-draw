@@ -51,10 +51,7 @@ class ErrorBoundary extends React.Component<
 }
 
 export default function App() {
-  const chaosTimerRef = useRef<number | null>(null) as React.MutableRefObject<
-    number | null
-  >;
-  const luckyBallsUsedRef = useRef(false);
+  // States
   const [mode, setMode] = useState<TreeMode>(TreeMode.FORMED);
   const [handPosition, setHandPosition] = useState<{
     x: number;
@@ -65,7 +62,6 @@ export default function App() {
   const [isLoadingShare, setIsLoadingShare] = useState(false);
   const [isSharedView, setIsSharedView] = useState(false);
   const [twoHandsDetected, setTwoHandsDetected] = useState(false);
-  const [peaceGestureDetected, setPeaceGestureDetected] = useState(false);
   const [closestPhoto, setClosestPhoto] = useState<string | null>(null);
   const [luckyBallsActive, setLuckyBallsActive] = useState(false);
   const [luckyBallsReady, setLuckyBallsReady] = useState(false);
@@ -78,7 +74,13 @@ export default function App() {
     detected: boolean;
   }>({ x: 0.5, y: 0.5, detected: false });
   const [isPinching, setIsPinching] = useState(false);
+
+  // Ref
   const orbitOffsetRef = useRef(0);
+  const chaosTimerRef = useRef<number | null>(null) as React.MutableRefObject<
+    number | null
+  >;
+  const luckyBallsUsedRef = useRef(false);
 
   // Check for share parameter in URL on mount
   useEffect(() => {
@@ -137,11 +139,11 @@ export default function App() {
     setTwoHandsDetected(detected);
   };
 
-  const handlePeaceGestureDetected = (detected: boolean) => {
-    setPeaceGestureDetected(detected);
-  };
-
-  const handleIndexFingerPosition = (x: number, y: number, detected: boolean) => {
+  const handleIndexFingerPosition = (
+    x: number,
+    y: number,
+    detected: boolean,
+  ) => {
     setIndexFingerPos({ x, y, detected });
   };
 
@@ -226,7 +228,6 @@ export default function App() {
               handPosition={handPosition}
               uploadedPhotos={uploadedPhotos}
               twoHandsDetected={twoHandsDetected}
-              peaceGestureDetected={peaceGestureDetected}
               onClosestPhotoChange={handleClosestPhotoChange}
               luckyBallsActive={luckyBallsActive}
               luckyPhoto={luckyPhoto}
@@ -271,7 +272,6 @@ export default function App() {
         onModeChange={setMode}
         onHandPosition={handleHandPosition}
         onTwoHandsDetected={handleTwoHandsDetected}
-        onPeaceGestureDetected={handlePeaceGestureDetected}
         onIndexFingerPosition={handleIndexFingerPosition}
         onPinchDetected={handlePinchDetected}
         onSwipe={handleSwipe}

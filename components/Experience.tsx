@@ -20,7 +20,6 @@ interface ExperienceProps {
   handPosition: { x: number; y: number; detected: boolean };
   uploadedPhotos: string[];
   twoHandsDetected: boolean;
-  peaceGestureDetected: boolean;
   onClosestPhotoChange?: (photoUrl: string | null) => void;
   luckyBallsActive: boolean;
   luckyPhoto: string;
@@ -36,7 +35,6 @@ export const Experience: React.FC<ExperienceProps> = ({
   handPosition,
   uploadedPhotos,
   twoHandsDetected,
-  peaceGestureDetected,
   onClosestPhotoChange,
   luckyBallsActive,
   luckyPhoto,
@@ -104,7 +102,6 @@ export const Experience: React.FC<ExperienceProps> = ({
         <LuckyBalls3D
           active={luckyBallsActive}
           twoHandsDetected={twoHandsDetected}
-          peaceGestureDetected={peaceGestureDetected}
           uploadedPhotos={uploadedPhotos}
           onPhotoSelected={onLuckyPhotoSelected}
           onDone={onLuckyBallsDone}
