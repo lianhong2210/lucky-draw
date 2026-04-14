@@ -243,7 +243,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
       if (ballStates.current[idx].phase === "ORBITING") {
         pickedRef.current = idx;
         ballStates.current[idx].phase = "PICKED";
-        pinchCooldownRef.current = 0.02; // 2 second cooldown
+        pinchCooldownRef.current = 2; // 2-second cooldown
       }
     }
     const t = state.clock.elapsedTime;
@@ -305,10 +305,11 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
 
     if (luckyPhoto && !readyToNextBatchRef.current) {
       readyToNextBatchRef.current = true;
+      pinchCooldownRef.current = 2.0;
     }
     if (!luckyPhoto && readyToNextBatchRef.current) {
       readyToNextBatchRef.current = false;
-      pinchCooldownRef.current = 1.0; // prevent the close-pinch from picking a ball
+      pinchCooldownRef.current = 2.0; // prevent the close-pinch from picking a ball
       // Don't reset all balls - just allow picking the next one
       pickedRef.current = -1;
       highlightedRef.current = -1;

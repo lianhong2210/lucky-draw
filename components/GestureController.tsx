@@ -36,7 +36,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
   // Index finger tracking for swipe detection
   const lastIndexXRef = useRef<number | null>(null);
   const pinchActiveRef = useRef(false);
-  const PINCH_THRESHOLD = 0.07; // Normalized distance threshold for pinch
+  const PINCH_THRESHOLD = 0.04; // Normalized distance threshold for pinch
   const SWIPE_THRESHOLD = 0.015; // Minimum delta to register as swipe
 
   useEffect(() => {
