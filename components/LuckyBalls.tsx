@@ -266,7 +266,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
           .add(rayDir.clone().multiplyScalar(projLen));
         const dist = closest.distanceTo(worldPos);
 
-        if (dist < BALL_RADIUS * 5 && dist < closestDist) {
+        if (dist < BALL_RADIUS && dist < closestDist) {
           closestDist = dist;
           closestIdx = i;
         }
