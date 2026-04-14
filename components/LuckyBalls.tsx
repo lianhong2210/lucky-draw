@@ -158,11 +158,13 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   const assignBallPosition = () => {
     const maxLength = getBallCountWithBatch();
 
-    if (maxLength < BALL_COUNT) {
+    if (maxLength === 0) {
+      ballStates.current = [];
       return;
     }
 
     // Reset ball states and ring positions
+    ballStates.current = [];
     let currentBallIndex = 0;
     for (let ringIdx = 0; ringIdx < ORBIT_RINGS.length; ringIdx++) {
       const ring = ORBIT_RINGS[ringIdx];
@@ -264,10 +266,10 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
       const rayOrigin = fingerRayOrigin.current;
       const rayDir = fingerRayDir.current;
 
-      const ballCountWithBatch = getBallCountWithBatch();
-      if (ballCountWithBatch === 0) return;
+      const ballCountForRay = ballStates.current.length;
+      if (ballCountForRay === 0) return;
 
-      for (let i = 0; i < ballCountWithBatch; i++) {
+      for (let i = 0; i < ballCountForRay; i++) {
         if (ballStates.current[i].phase !== "ORBITING") continue;
 
         const mesh = ballRefs.current[i];
@@ -308,10 +310,10 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
     }
 
     // --- Update each ball ---
-    const ballCountWithBatch = getBallCountWithBatch();
-    if (ballCountWithBatch === 0) return;
+    const ballCountForUpdate = ballStates.current.length;
+    if (ballCountForUpdate === 0) return;
 
-    for (let i = 0; i < BALL_COUNT; i++) {
+    for (let i = 0; i < ballCountForUpdate; i++) {
       if (!ballStates.current[i]) break;
 
       const mesh = ballRefs.current[i];
