@@ -47,6 +47,11 @@ const PolaroidItem: React.FC<{
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const [error, setError] = useState(false);
 
+  // Reusable objects to avoid per-frame allocations
+  const _dummy = useMemo(() => new THREE.Object3D(), []);
+  const _cameraPos = useMemo(() => new THREE.Vector3(0, 9, 20), []);
+  const _euler = useMemo(() => new THREE.Euler(), []);
+
   // Safe texture loading that won't crash the app if a file is missing
   useEffect(() => {
     const loader = new THREE.TextureLoader();
@@ -84,13 +89,12 @@ const PolaroidItem: React.FC<{
     // 2. Rotation & Sway Logic
     if (isFormed) {
       // Look at center but face outward
-      const dummy = new THREE.Object3D();
-      dummy.position.copy(groupRef.current.position);
-      dummy.lookAt(0, groupRef.current.position.y, 0);
-      dummy.rotateY(Math.PI); // Flip to face out
+      _dummy.position.copy(groupRef.current.position);
+      _dummy.lookAt(0, groupRef.current.position.y, 0);
+      _dummy.rotateY(Math.PI); // Flip to face out
 
       // Base rotation alignment
-      groupRef.current.quaternion.slerp(dummy.quaternion, step);
+      groupRef.current.quaternion.slerp(_dummy.quaternion, step);
 
       // Physical Swaying (Wind)
       // Z-axis rotation for side-to-side swing
@@ -104,33 +108,27 @@ const PolaroidItem: React.FC<{
       // Easier: Set rotation directly based on dummy + sway.
 
       // Calculate the "perfect" rotation
-      const currentRot = new THREE.Euler().setFromQuaternion(
-        groupRef.current.quaternion,
-      );
-      groupRef.current.rotation.z = currentRot.z + swayAngle * 0.05;
-      groupRef.current.rotation.x = currentRot.x + tiltAngle * 0.05;
+      _euler.setFromQuaternion(groupRef.current.quaternion);
+      groupRef.current.rotation.z = _euler.z + swayAngle * 0.05;
+      groupRef.current.rotation.x = _euler.x + tiltAngle * 0.05;
     } else {
       // Chaos mode - face toward camera with gentle floating
       // Camera position relative to scene group: [0, 9, 20]
-      const cameraPos = new THREE.Vector3(0, 9, 20);
-      const dummy = new THREE.Object3D();
-      dummy.position.copy(groupRef.current.position);
+      _dummy.position.copy(groupRef.current.position);
 
       // Make photos face the camera
-      dummy.lookAt(cameraPos);
+      _dummy.lookAt(_cameraPos);
 
       // Smoothly rotate to face camera
-      groupRef.current.quaternion.slerp(dummy.quaternion, delta * 3);
+      groupRef.current.quaternion.slerp(_dummy.quaternion, delta * 3);
 
       // Add gentle floating wobble
       const wobbleX = Math.sin(time * 1.5 + swayOffset) * 0.03;
       const wobbleZ = Math.cos(time * 1.2 + swayOffset) * 0.03;
 
-      const currentRot = new THREE.Euler().setFromQuaternion(
-        groupRef.current.quaternion,
-      );
-      groupRef.current.rotation.x = currentRot.x + wobbleX;
-      groupRef.current.rotation.z = currentRot.z + wobbleZ;
+      _euler.setFromQuaternion(groupRef.current.quaternion);
+      groupRef.current.rotation.x = _euler.x + wobbleX;
+      groupRef.current.rotation.z = _euler.z + wobbleZ;
     }
   });
 

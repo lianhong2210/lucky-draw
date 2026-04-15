@@ -13,6 +13,7 @@ import { LogoOrnaments } from "./Ornaments";
 import { Polaroids } from "./Polaroids";
 import { LuckyBalls3D } from "./LuckyBalls";
 import { TreeMode } from "../types";
+import type { PerfConfig } from "../utils/performanceTier";
 import * as THREE from "three";
 
 interface ExperienceProps {
@@ -31,6 +32,7 @@ interface ExperienceProps {
   isPinching: boolean;
   isPinchingRef: React.RefObject<boolean>;
   orbitOffsetRef: React.RefObject<number>;
+  perfConfig: PerfConfig;
 }
 
 export const Experience: React.FC<ExperienceProps> = ({
@@ -47,6 +49,7 @@ export const Experience: React.FC<ExperienceProps> = ({
   isPinching,
   isPinchingRef,
   orbitOffsetRef,
+  perfConfig,
 }) => {
   const controlsRef = useRef<any>(null);
   const raycaster = useRef(new THREE.Raycaster());
@@ -81,22 +84,31 @@ export const Experience: React.FC<ExperienceProps> = ({
       />
 
       {/* Lighting Setup for Maximum Luxury */}
-      <Environment preset="dawn" background={false} blur={0.8} />
+      {perfConfig.enableEnvironment && (
+        <Environment preset="dawn" background={false} blur={0.8} />
+      )}
 
-      <ambientLight intensity={0.2} color="#004422" />
+      <ambientLight
+        intensity={perfConfig.enableEnvironment ? 0.2 : 0.4}
+        color="#004422"
+      />
       <spotLight
         position={[10, 20, 10]}
         angle={0.2}
         penumbra={1}
         intensity={2}
         color="#fff5cc"
-        castShadow
+        castShadow={perfConfig.enableSpotlightShadow}
       />
       <pointLight position={[-10, 5, -10]} intensity={1} color="#D4AF37" />
 
       <group position={[0, -5, 0]}>
-        <Foliage mode={mode} count={12000} />
-        {/* <LogoOrnaments mode={mode} count={400} /> */}
+        <Foliage mode={mode} count={perfConfig.particleCount} />
+        <LogoOrnaments
+          mode={mode}
+          count={perfConfig.ornamentCount}
+          enableHover={perfConfig.enableOrnamentHover}
+        />
         <Polaroids
           mode={mode}
           uploadedPhotos={uploadedPhotos}
@@ -116,28 +128,38 @@ export const Experience: React.FC<ExperienceProps> = ({
           isPinchingRef={isPinchingRef}
           orbitOffsetRef={orbitOffsetRef}
           luckyPhoto={luckyPhoto}
+          sphereSegments={perfConfig.sphereSegments}
         />
 
-        {/* Floor Reflections */}
-        <ContactShadows
-          opacity={0.7}
-          scale={30}
-          blur={2}
-          far={4.5}
-          color="#000000"
-        />
+        {/* Floor Reflections - disabled on low-end devices */}
+        {perfConfig.enableContactShadows && (
+          <ContactShadows
+            opacity={0.7}
+            scale={30}
+            blur={2}
+            far={4.5}
+            color="#000000"
+          />
+        )}
       </group>
 
-      <EffectComposer enableNormalPass={false}>
-        <Bloom
-          luminanceThreshold={0.8}
-          mipmapBlur
-          intensity={1.5}
-          radius={0.6}
-        />
-        <Vignette eskil={false} offset={0.1} darkness={0.7} />
-        <Noise opacity={0.02} blendFunction={BlendFunction.OVERLAY} />
-      </EffectComposer>
+      {/* Post-processing - scaled by performance tier */}
+      {perfConfig.enableBloom && (
+        <EffectComposer enableNormalPass={false}>
+          <Bloom
+            luminanceThreshold={0.8}
+            mipmapBlur
+            intensity={1.5}
+            radius={0.6}
+          />
+          {perfConfig.enableExtraEffects && (
+            <>
+              <Vignette eskil={false} offset={0.1} darkness={0.7} />
+              <Noise opacity={0.02} blendFunction={BlendFunction.OVERLAY} />
+            </>
+          )}
+        </EffectComposer>
+      )}
     </>
   );
 };

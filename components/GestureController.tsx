@@ -31,13 +31,22 @@ export const GestureController: React.FC<GestureControllerProps> = ({
   // Debounce logic refs
   const openFrames = useRef(0);
   const closedFrames = useRef(0);
-  const CONFIDENCE_THRESHOLD = 5; // Number of consecutive frames to confirm gesture
+  const CONFIDENCE_THRESHOLD = 8; // Number of consecutive frames to confirm gesture (was 5)
 
   // Index finger tracking for swipe detection
   const lastIndexXRef = useRef<number | null>(null);
   const pinchActiveRef = useRef(false);
-  const PINCH_THRESHOLD = 0.04; // Normalized distance threshold for pinch
-  const SWIPE_THRESHOLD = 0.015; // Minimum delta to register as swipe
+  const PINCH_ON_THRESHOLD = 0.06; // Distance to activate pinch (was 0.04)
+  const PINCH_OFF_THRESHOLD = 0.08; // Distance to deactivate pinch (hysteresis)
+  const SWIPE_THRESHOLD = 0.025; // Minimum delta to register as swipe (was 0.015)
+  const consecutiveSwipeFrames = useRef(0);
+  const SWIPE_FRAME_THRESHOLD = 2; // Require N consecutive frames for swipe
+
+  // Exponential moving average (EMA) smoothing for landmarks
+  const smoothedLandmarksRef = useRef<
+    { x: number; y: number; z: number }[] | null
+  >(null);
+  const SMOOTH_FACTOR = 0.45; // 0 = full smoothing, 1 = no smoothing
 
   useEffect(() => {
     let handLandmarker: HandLandmarker | null = null;
@@ -58,7 +67,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
             delegate: "GPU",
           },
           runningMode: "VIDEO",
-          numHands: 1,
+          numHands: 2,
         });
 
         startWebcam();
@@ -247,7 +256,32 @@ export const GestureController: React.FC<GestureControllerProps> = ({
       animationFrameId = requestAnimationFrame(predictWebcam);
     };
 
-    const detectGesture = (landmarks: any[]) => {
+    const smoothLandmarks = (rawLandmarks: any[]): any[] => {
+      if (!smoothedLandmarksRef.current) {
+        // First frame: initialize with raw values
+        smoothedLandmarksRef.current = rawLandmarks.map((lm) => ({
+          x: lm.x,
+          y: lm.y,
+          z: lm.z ?? 0,
+        }));
+        return rawLandmarks;
+      }
+      // Apply EMA smoothing per landmark
+      const smoothed = rawLandmarks.map((lm, i) => {
+        const prev = smoothedLandmarksRef.current![i];
+        const sx = prev.x * (1 - SMOOTH_FACTOR) + lm.x * SMOOTH_FACTOR;
+        const sy = prev.y * (1 - SMOOTH_FACTOR) + lm.y * SMOOTH_FACTOR;
+        const sz = prev.z * (1 - SMOOTH_FACTOR) + (lm.z ?? 0) * SMOOTH_FACTOR;
+        smoothedLandmarksRef.current![i] = { x: sx, y: sy, z: sz };
+        return { x: sx, y: sy, z: sz };
+      });
+      return smoothed;
+    };
+
+    const detectGesture = (rawLandmarks: any[]) => {
+      // Apply EMA smoothing to reduce jitter
+      const landmarks = smoothLandmarks(rawLandmarks);
+
       // 0 is Wrist
       // Tips: 8 (Index), 12 (Middle), 16 (Ring), 20 (Pinky)
       // Bases (MCP): 5, 9, 13, 17
@@ -286,7 +320,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
 
       const indexTip = landmarks[8];
 
-      // --- Pinch detection: thumb tip (4) to index tip (8) distance ---
+      // --- Pinch detection with hysteresis to prevent flickering ---
       const thumbTipLm = landmarks[4];
       const indexTipLm = landmarks[8];
       const dz = (thumbTipLm.z ?? 0) - (indexTipLm.z ?? 0);
@@ -295,7 +329,10 @@ export const GestureController: React.FC<GestureControllerProps> = ({
         thumbTipLm.y - indexTipLm.y,
         dz,
       );
-      const isPinching = pinchDist < PINCH_THRESHOLD;
+      // Hysteresis: use tighter threshold to activate, looser to deactivate
+      const isPinching = pinchActiveRef.current
+        ? pinchDist < PINCH_OFF_THRESHOLD // Must exceed OFF threshold to release
+        : pinchDist < PINCH_ON_THRESHOLD; // Must be below ON threshold to activate
       if (isPinching !== pinchActiveRef.current) {
         pinchActiveRef.current = isPinching;
         if (onPinchDetected) {
@@ -303,13 +340,16 @@ export const GestureController: React.FC<GestureControllerProps> = ({
         }
       }
 
-      // --- Horizontal swipe detection based on index finger X movement ---
-      // Only allow right-to-left swipes (negative deltaX)
+      // --- Horizontal swipe detection with consecutive frame filtering ---
       if (lastIndexXRef.current !== null && onSwipe) {
         const deltaX = indexTip.x - lastIndexXRef.current;
-        // Right-to-left swipe: deltaX is negative (finger moving left)
         if (deltaX > SWIPE_THRESHOLD) {
-          onSwipe(deltaX);
+          consecutiveSwipeFrames.current++;
+          if (consecutiveSwipeFrames.current >= SWIPE_FRAME_THRESHOLD) {
+            onSwipe(deltaX);
+          }
+        } else {
+          consecutiveSwipeFrames.current = 0;
         }
       }
       lastIndexXRef.current = indexTip.x;
