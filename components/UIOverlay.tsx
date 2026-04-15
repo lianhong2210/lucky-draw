@@ -239,11 +239,11 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({
     <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-10">
       {/* Picked Names List - Left Side */}
       {pickedNames.length > 0 && (
-        <div className="absolute top-24 left-8 pointer-events-auto max-h-[70vh] min-w-[150px]">
+        <div className="absolute top-24 left-8 pointer-events-auto w-[200px]">
           <h2 className="text-lg font-serif text-[#D4AF37] tracking-wider mb-1 drop-shadow-lg">
             Picked
           </h2>
-          <div className="flex flex-col gap-2 overflow-y-auto">
+          <div className="flex flex-col gap-2 max-h-[70vh] overflow-y-auto">
             {pickedNames.map((name, i) => (
               <div
                 key={i}
