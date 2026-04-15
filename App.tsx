@@ -4,7 +4,6 @@ import React, {
   useEffect,
   useRef,
   useCallback,
-  useMemo,
 } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Loader } from "@react-three/drei";
@@ -12,7 +11,6 @@ import { Experience } from "./components/Experience";
 import { UIOverlay } from "./components/UIOverlay";
 import { GestureController } from "./components/GestureController";
 import { TreeMode } from "./types";
-import { getPerformanceConfig } from "./utils/performanceTier";
 
 // Simple Error Boundary to catch 3D resource loading errors (like textures)
 class ErrorBoundary extends React.Component<
@@ -59,15 +57,6 @@ class ErrorBoundary extends React.Component<
 }
 
 export default function App() {
-  // Performance configuration (computed once on mount)
-  const perfConfig = useMemo(() => {
-    const config = getPerformanceConfig();
-    console.log(
-      `[Perf] Detected tier: ${config.tier} — particles: ${config.particleCount}, ornaments: ${config.ornamentCount}, bloom: ${config.enableBloom}`,
-    );
-    return config;
-  }, []);
-
   // States
   const [mode, setMode] = useState<TreeMode>(TreeMode.FORMED);
   const [handPosition, setHandPosition] = useState<{
@@ -147,9 +136,9 @@ export default function App() {
 
     loadSharedPhotos();
 
-    setTimeout(() => {
-      isChaosReadyRef.current = true;
-    }, 5000);
+    setTimeout(()=> {
+      isChaosReadyRef.current = true
+    }, 5000)
   }, []);
 
   const toggleMode = () => {
@@ -159,8 +148,8 @@ export default function App() {
   };
 
   const handleSetMode = (mode: React.SetStateAction<TreeMode>) => {
-    if (isChaosReadyRef.current) setMode(mode);
-  };
+    if(isChaosReadyRef.current) setMode(mode);
+  }
 
   const handleHandPosition = (x: number, y: number, detected: boolean) => {
     setHandPosition({ x, y, detected });
@@ -195,8 +184,9 @@ export default function App() {
   useEffect(() => {
     if (mode === TreeMode.CHAOS) {
       // Start 2-second timer
-      chaosTimerRef.current = window.setTimeout(() => {}, 2000);
-      if (isFirstChaosRef.current) {
+      chaosTimerRef.current = window.setTimeout(() => {
+      }, 2000);
+      if (isFirstChaosRef.current){
         isFirstChaosRef.current = false;
         setLuckyBallsActive(true);
       }
@@ -296,7 +286,6 @@ export default function App() {
               isPinching={isPinching}
               isPinchingRef={isPinchingRef}
               orbitOffsetRef={orbitOffsetRef}
-              perfConfig={perfConfig}
             />
           </Suspense>
         </Canvas>

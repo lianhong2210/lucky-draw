@@ -13,13 +13,11 @@ import { loadSvgCandidates, sampleSvgVector3 } from "../utils/svgSampler";
 interface LogoOrnamentsProps {
   mode: TreeMode;
   count: number;
-  enableHover?: boolean;
 }
 
 export const LogoOrnaments: React.FC<LogoOrnamentsProps> = ({
   mode,
   count,
-  enableHover = true,
 }) => {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
@@ -68,11 +66,6 @@ export const LogoOrnaments: React.FC<LogoOrnamentsProps> = ({
     meshRef.current.instanceColor!.needsUpdate = true;
   }, [count]);
 
-  // Reusable objects to avoid per-frame allocations
-  const _pos = useMemo(() => new THREE.Vector3(), []);
-  const _quat = useMemo(() => new THREE.Quaternion(), []);
-  const _scale = useMemo(() => new THREE.Vector3(), []);
-
   useFrame((state, delta) => {
     if (!meshRef.current || instanceData.length === 0) return;
     const isFormed = mode === TreeMode.FORMED;
@@ -80,18 +73,14 @@ export const LogoOrnaments: React.FC<LogoOrnamentsProps> = ({
 
     instanceData.forEach((d, i) => {
       meshRef.current!.getMatrixAt(i, dummy.matrix);
-      dummy.matrix.decompose(_pos, _quat, _scale);
-      dummy.position.copy(_pos);
-      dummy.quaternion.copy(_quat);
+      dummy.matrix.decompose(dummy.position, dummy.quaternion, dummy.scale);
 
       const dest = isFormed ? d.targetPos : d.chaosPos;
       dummy.position.lerp(dest, delta * d.speed);
 
       if (isFormed) {
-        // Subtle hover animation - skip on low-end to save CPU
-        if (enableHover) {
-          dummy.position.y += Math.sin(t * 2 + d.phase) * 0.002;
-        }
+        // Subtle hover animation
+        dummy.position.y += Math.sin(t * 2 + d.phase) * 0.002;
         // Face "up"
         dummy.rotation.set(-Math.PI / 2, 0, 0);
       } else {

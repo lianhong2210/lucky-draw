@@ -101,7 +101,6 @@ interface LuckyBalls3DProps {
   isPinchingRef: React.RefObject<boolean>;
   orbitOffsetRef: React.RefObject<number>;
   luckyPhoto: { name: string; imageUrl: string };
-  sphereSegments?: number;
 }
 
 export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
@@ -117,7 +116,6 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   isPinchingRef,
   orbitOffsetRef,
   luckyPhoto,
-  sphereSegments = 24,
 }) => {
   const photos = useRef<{ name: string; imageUrl: string }[]>(PhotoListing);
   const pickedPhotos = useRef<{ name: string; imageUrl: string }[]>([]);
@@ -135,19 +133,13 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   const ballLertRef = useRef(0.5);
   const isBallReadyRef = useRef(false);
 
-  // Reusable vector objects to avoid per-frame allocations
-  const _worldPos = useRef(new THREE.Vector3());
-  const _toCenter = useRef(new THREE.Vector3());
-  const _closest = useRef(new THREE.Vector3());
-  const _rayDirScaled = useRef(new THREE.Vector3());
-
   const getBallCountWithBatch = () => {
     return photos.current.length >= BALL_COUNT
       ? BALL_COUNT
       : photos.current.length;
   };
 
-  const assignBallPosition = (initial = false) => {
+  const assignBallPosition = (initial=false) => {
     const maxLength = getBallCountWithBatch();
 
     if (maxLength === 0) {
@@ -155,7 +147,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
       return;
     }
 
-    if (initial) {
+    if (initial){
       // Reset ball states and ring positions
       ballStates.current = [];
       let currentBallIndex = 0;
@@ -171,11 +163,12 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
             emissive: BALL_EMISSIVE[currentBallIndex % BALL_EMISSIVE.length],
             ringIndex: ringIdx,
             indexInRing: i,
-            isInitial: true,
+            isInitial: true
           };
           currentBallIndex++;
         }
       }
+      
     } else {
       // Reset ball states and ring positions
       ballStates.current = [];
@@ -192,12 +185,14 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
             emissive: BALL_EMISSIVE[currentBallIndex % BALL_EMISSIVE.length],
             ringIndex: ringIdx,
             indexInRing: i,
-            isInitial: false,
+            isInitial: false
           };
           currentBallIndex++;
         }
       }
     }
+
+
   };
 
   // Compute ball world position given time and orbit offset
@@ -208,9 +203,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   ): THREE.Vector3 => {
     const state = ballStates.current[ballIndex];
     if (!state) return new THREE.Vector3();
-    const ring = state.isInitial
-      ? INITIAL_ORBIT_RINGS[state.ringIndex]
-      : ORBIT_RINGS[state.ringIndex];
+    const ring = state.isInitial ? INITIAL_ORBIT_RINGS[state.ringIndex] : ORBIT_RINGS[state.ringIndex];
     const angleStep = (Math.PI * 2) / ring.count;
     const angle =
       state.indexInRing * angleStep + time * ring.speed + orbitOffset;
@@ -227,17 +220,17 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
       phaseRef.current = "ACTIVE";
       assignBallPosition(true);
 
-      setTimeout(() => {
+      setTimeout(()=>{
         // Ball speed (Returning to original orbit)
-        ballLertRef.current = 0.15;
-        assignBallPosition();
-      }, 2000);
+        ballLertRef.current = 0.15
+        assignBallPosition()
+      },2000)
 
       setTimeout(() => {
         // Ball speed (After returned to original orbit)
-        ballLertRef.current = 0.3;
-        isBallReadyRef.current = true;
-      }, 5000);
+        ballLertRef.current = 0.3
+        isBallReadyRef.current = true
+      },5000)
     }
   }, [active]);
 
@@ -306,17 +299,19 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
         const mesh = ballRefs.current[i];
         if (!mesh) continue;
 
-        // Get world position of ball (reuse vector)
-        mesh.getWorldPosition(_worldPos.current);
+        // Get world position of ball
+        const worldPos = new THREE.Vector3();
+        mesh.getWorldPosition(worldPos);
 
-        // Distance from ray to sphere center (reuse vectors)
-        _toCenter.current.copy(_worldPos.current).sub(rayOrigin);
-        const projLen = _toCenter.current.dot(rayDir);
+        // Distance from ray to sphere center
+        const toCenter = worldPos.clone().sub(rayOrigin);
+        const projLen = toCenter.dot(rayDir);
         if (projLen < 0) continue; // Behind camera
 
-        _rayDirScaled.current.copy(rayDir).multiplyScalar(projLen);
-        _closest.current.copy(rayOrigin).add(_rayDirScaled.current);
-        const dist = _closest.current.distanceTo(_worldPos.current);
+        const closest = rayOrigin
+          .clone()
+          .add(rayDir.clone().multiplyScalar(projLen));
+        const dist = closest.distanceTo(worldPos);
 
         if (dist < BALL_RADIUS && dist < closestDist) {
           closestDist = dist;
@@ -494,9 +489,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
           position={[0, ORBIT_RINGS[bs.ringIndex].y, 0]}
           scale={1}
         >
-          <sphereGeometry
-            args={[BALL_RADIUS, sphereSegments, sphereSegments]}
-          />
+          <sphereGeometry args={[BALL_RADIUS, 24, 24]} />
           <meshStandardMaterial
             color={bs.color}
             emissive={bs.emissive}
