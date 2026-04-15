@@ -85,6 +85,7 @@ export default function App() {
   }>({ x: 0.5, y: 0.5, detected: false });
   const [isPinching, setIsPinching] = useState(false);
   const isPinchingRef = useRef(false);
+  const isFirstChaosRef = useRef(true);
 
   // Ref
   const orbitOffsetRef = useRef(0);
@@ -176,28 +177,23 @@ export default function App() {
     if (mode === TreeMode.CHAOS) {
       // Start 2-second timer
       chaosTimerRef.current = window.setTimeout(() => {
-        setLuckyBallsReady(true);
       }, 2000);
+      if (isFirstChaosRef.current){
+        isFirstChaosRef.current = false;
+        setLuckyBallsActive(true);
+      }
     } else {
       // Mode went back to FORMED - cancel timer and reset
       if (chaosTimerRef.current) {
         clearTimeout(chaosTimerRef.current);
         chaosTimerRef.current = null;
       }
-      setLuckyBallsReady(false);
       luckyBallsUsedRef.current = false; // reset so it can trigger again next chaos
     }
     return () => {
       if (chaosTimerRef.current) clearTimeout(chaosTimerRef.current);
     };
   }, [mode]);
-
-  // Activate orbit balls once a hand is detected - they stay visible permanently
-  useEffect(() => {
-    if (handPosition.detected && !luckyBallsActive) {
-      setLuckyBallsActive(true);
-    }
-  }, [handPosition.detected, luckyBallsActive]);
 
   const handleLuckyBallsClose = () => {
     setLuckyBallsActive(false);
