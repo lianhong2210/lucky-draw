@@ -96,7 +96,7 @@ export const Experience: React.FC<ExperienceProps> = ({
 
       <group position={[0, -5, 0]}>
         <Foliage mode={mode} count={12000} />
-        <LogoOrnaments mode={mode} count={400} />
+        {/* <LogoOrnaments mode={mode} count={400} /> */}
         <Polaroids
           mode={mode}
           uploadedPhotos={uploadedPhotos}
