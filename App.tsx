@@ -70,7 +70,6 @@ export default function App() {
   const [twoHandsDetected, setTwoHandsDetected] = useState(false);
   const [closestPhoto, setClosestPhoto] = useState<string | null>(null);
   const [luckyBallsActive, setLuckyBallsActive] = useState(false);
-  const [luckyBallsReady, setLuckyBallsReady] = useState(false);
   const [luckyPhoto, setLuckyPhoto] = useState<{
     name: string;
     imageUrl: string;
@@ -86,6 +85,7 @@ export default function App() {
   const [isPinching, setIsPinching] = useState(false);
   const isPinchingRef = useRef(false);
   const isFirstChaosRef = useRef(true);
+  const isChaosReadyRef = useRef(false);
 
   // Ref
   const orbitOffsetRef = useRef(0);
@@ -135,13 +135,21 @@ export default function App() {
     };
 
     loadSharedPhotos();
+
+    setTimeout(()=> {
+      isChaosReadyRef.current = true
+    }, 5000)
   }, []);
 
   const toggleMode = () => {
-    setMode((prev) =>
+    handleSetMode((prev) =>
       prev === TreeMode.FORMED ? TreeMode.CHAOS : TreeMode.FORMED,
     );
   };
+
+  const handleSetMode = (mode: React.SetStateAction<TreeMode>) => {
+    if(isChaosReadyRef.current) setMode(mode);
+  }
 
   const handleHandPosition = (x: number, y: number, detected: boolean) => {
     setHandPosition({ x, y, detected });
@@ -312,7 +320,7 @@ export default function App() {
       {/* Gesture Control Module */}
       <GestureController
         currentMode={mode}
-        onModeChange={setMode}
+        onModeChange={handleSetMode}
         onHandPosition={handleHandPosition}
         onTwoHandsDetected={handleTwoHandsDetected}
         onIndexFingerPosition={handleIndexFingerPosition}

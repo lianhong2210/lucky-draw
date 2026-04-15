@@ -388,7 +388,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
       cancelAnimationFrame(animationFrameId);
       if (handLandmarker) handLandmarker.close();
     };
-  }, [onModeChange]);
+  }, []);
 
   // Sync ref with prop updates to prevent overriding in closure
   useEffect(() => {
