@@ -33,8 +33,8 @@ export const GestureController: React.FC<GestureControllerProps> = ({
   const closedFrames = useRef(0);
   const CONFIDENCE_THRESHOLD = 3; // Number of consecutive frames to confirm gesture
 
-  // Pinky finger tracking for swipe detection
-  const lastPinkyXRef = useRef<number | null>(null);
+  // Palm center tracking for swipe detection
+  const lastPalmXRef = useRef<number | null>(null);
   const grabActiveRef = useRef(false);
   const SWIPE_THRESHOLD = 0.008; // Minimum delta to register as swipe (reduced from 0.015 for more sensitivity)
 
@@ -223,7 +223,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
             grabActiveRef.current = false;
             onGrabDetected(false);
           }
-          lastPinkyXRef.current = null;
+          lastPalmXRef.current = null;
           // Clear canvas when no hand detected
           if (canvasRef.current) {
             const ctx = canvasRef.current.getContext("2d");
@@ -314,9 +314,9 @@ export const GestureController: React.FC<GestureControllerProps> = ({
         grabThumbTip.x - grabIndexBase.x,
         grabThumbTip.y - grabIndexBase.y,
       );
-      const isThumbCurled = thumbToIndexDist < 0.18; // Threshold for thumb curl (increased from 0.15 for more sensitivity)
+      const isThumbCurled = thumbToIndexDist < 0.1; // Threshold for thumb curl
 
-      // Grab is detected when at least 2 fingers are curled and thumb is curled (reduced from 3 for more sensitivity)
+      // Grab is detected when at least 2 fingers are curled and thumb is curled
       const isGrabbing = curledFingers >= 2 && isThumbCurled;
 
       if (isGrabbing !== grabActiveRef.current) {
@@ -326,17 +326,15 @@ export const GestureController: React.FC<GestureControllerProps> = ({
         }
       }
 
-      // --- Horizontal swipe detection based on pinky finger X movement ---
-      // Only allow right-to-left swipes (negative deltaX)
-      const pinkyTip = landmarks[20]; // Pinky tip landmark
-      if (lastPinkyXRef.current !== null && onSwipe) {
-        const deltaX = pinkyTip.x - lastPinkyXRef.current;
-        // Right-to-left swipe: deltaX is negative (finger moving left)
+      // --- Horizontal swipe detection based on palm center X movement ---
+      if (lastPalmXRef.current !== null && onSwipe) {
+        const deltaX = palmCenterX - lastPalmXRef.current;
+        // Right-to-left swipe: deltaX is negative (palm moving left)
         if (deltaX > SWIPE_THRESHOLD) {
           onSwipe(deltaX);
         }
       }
-      lastPinkyXRef.current = pinkyTip.x;
+      lastPalmXRef.current = palmCenterX;
 
       const fingerTips = [8, 12, 16, 20];
       const fingerBases = [5, 9, 13, 17];
