@@ -33,8 +33,8 @@ export const GestureController: React.FC<GestureControllerProps> = ({
   const closedFrames = useRef(0);
   const CONFIDENCE_THRESHOLD = 3; // Number of consecutive frames to confirm gesture
 
-  // Index finger tracking for swipe detection
-  const lastIndexXRef = useRef<number | null>(null);
+  // Pinky finger tracking for swipe detection
+  const lastPinkyXRef = useRef<number | null>(null);
   const grabActiveRef = useRef(false);
   const SWIPE_THRESHOLD = 0.008; // Minimum delta to register as swipe (reduced from 0.015 for more sensitivity)
 
@@ -223,7 +223,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
             grabActiveRef.current = false;
             onGrabDetected(false);
           }
-          lastIndexXRef.current = null;
+          lastPinkyXRef.current = null;
           // Clear canvas when no hand detected
           if (canvasRef.current) {
             const ctx = canvasRef.current.getContext("2d");
@@ -326,16 +326,17 @@ export const GestureController: React.FC<GestureControllerProps> = ({
         }
       }
 
-      // --- Horizontal swipe detection based on index finger X movement ---
+      // --- Horizontal swipe detection based on pinky finger X movement ---
       // Only allow right-to-left swipes (negative deltaX)
-      if (lastIndexXRef.current !== null && onSwipe) {
-        const deltaX = indexTip.x - lastIndexXRef.current;
+      const pinkyTip = landmarks[20]; // Pinky tip landmark
+      if (lastPinkyXRef.current !== null && onSwipe) {
+        const deltaX = pinkyTip.x - lastPinkyXRef.current;
         // Right-to-left swipe: deltaX is negative (finger moving left)
         if (deltaX > SWIPE_THRESHOLD) {
           onSwipe(deltaX);
         }
       }
-      lastIndexXRef.current = indexTip.x;
+      lastPinkyXRef.current = pinkyTip.x;
 
       const fingerTips = [8, 12, 16, 20];
       const fingerBases = [5, 9, 13, 17];
