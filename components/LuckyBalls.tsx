@@ -10,13 +10,13 @@ import PhotoListing from "../src/listing/sample.json";
  * - 20 balls orbit around the foliage/ornaments in circular rings
  * - Each ball stores an image from uploadedPhotos
  * - Finger pointer (index finger) highlights the closest ball
- * - Pinch gesture picks the highlighted ball
+ * - Grab gesture picks the highlighted ball
  * - Picked ball explodes and reveals its stored image
  * - Horizontal swipe rotates the orbit
  * - Auto-rotation when no swipe input
  */
 
-const BALL_RADIUS = 0.8;
+const BALL_RADIUS = 0.6;
 
 // Distribute balls across 2 orbit rings at different heights
 const INITIAL_ORBIT_RINGS = [
@@ -24,8 +24,8 @@ const INITIAL_ORBIT_RINGS = [
   { y: 7, radius: 30, count: 10, speed: 3 }, // Upper ring - tighter, opposite dir
 ];
 const ORBIT_RINGS = [
-  { y: 3, radius: 7.5, count: 10, speed: 0 }, // Lower ring - wider
-  { y: 7, radius: 6, count: 10, speed: -0.05 }, // Upper ring - tighter, opposite dir
+  { y: 3, radius: 7.5, count: 8, speed: 0 }, // Lower ring - wider
+  { y: 7, radius: 6, count: 8, speed: -0.05 }, // Upper ring - tighter, opposite dir
 ];
 const BALL_COUNT = ORBIT_RINGS.reduce((acc, cur) => (acc += cur.count), 0);
 
@@ -97,8 +97,8 @@ interface LuckyBalls3DProps {
   fingerRayOrigin: React.RefObject<THREE.Vector3>;
   fingerRayDir: React.RefObject<THREE.Vector3>;
   fingerDetected: boolean;
-  isPinching: boolean;
-  isPinchingRef: React.RefObject<boolean>;
+  isGrabbing: boolean;
+  isGrabbingRef: React.RefObject<boolean>;
   orbitOffsetRef: React.RefObject<number>;
   luckyPhoto: { name: string; imageUrl: string };
 }
@@ -112,8 +112,8 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   fingerRayOrigin,
   fingerRayDir,
   fingerDetected,
-  isPinching,
-  isPinchingRef,
+  isGrabbing,
+  isGrabbingRef,
   orbitOffsetRef,
   luckyPhoto,
 }) => {
@@ -248,7 +248,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
 
   useFrame((state) => {
     if (
-      isPinchingRef.current &&
+      isGrabbingRef.current &&
       !luckyPhoto &&
       isBallReadyRef.current &&
       highlightedRef.current >= 0 &&
@@ -450,9 +450,9 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
       {/* Ambient light for ball area */}
       <pointLight
         position={[0, 5, 0]}
-        intensity={2}
+        intensity={1.5}
         color="#D4AF37"
-        distance={20}
+        distance={15}
         decay={2}
       />
 
@@ -461,10 +461,10 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
         position={[0, 15, 5]}
         angle={0.5}
         penumbra={0.8}
-        intensity={3}
+        intensity={2}
         color="#FFFFFF"
-        castShadow
-        distance={25}
+        castShadow={false}
+        distance={20}
         decay={1.5}
       />
 
@@ -478,7 +478,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
           position={[0, ORBIT_RINGS[bs.ringIndex].y, 0]}
           scale={1}
         >
-          <sphereGeometry args={[BALL_RADIUS, 24, 24]} />
+          <sphereGeometry args={[BALL_RADIUS, 16, 16]} />
           <meshStandardMaterial
             color={bs.color}
             emissive={bs.emissive}

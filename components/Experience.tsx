@@ -28,8 +28,8 @@ interface ExperienceProps {
   ) => void;
   onLuckyBallsDone: () => void;
   indexFingerPos: { x: number; y: number; detected: boolean };
-  isPinching: boolean;
-  isPinchingRef: React.RefObject<boolean>;
+  isGrabbing: boolean;
+  isGrabbingRef: React.RefObject<boolean>;
   orbitOffsetRef: React.RefObject<number>;
 }
 
@@ -44,8 +44,8 @@ export const Experience: React.FC<ExperienceProps> = ({
   onLuckyPhotoSelected,
   onLuckyBallsDone,
   indexFingerPos,
-  isPinching,
-  isPinchingRef,
+  isGrabbing,
+  isGrabbingRef,
   orbitOffsetRef,
 }) => {
   const controlsRef = useRef<any>(null);
@@ -95,7 +95,7 @@ export const Experience: React.FC<ExperienceProps> = ({
       <pointLight position={[-10, 5, -10]} intensity={1} color="#D4AF37" />
 
       <group position={[0, -5, 0]}>
-        <Foliage mode={mode} count={12000} />
+        <Foliage mode={mode} count={3500} />
         {/* <LogoOrnaments mode={mode} count={400} /> */}
         <Polaroids
           mode={mode}
@@ -112,8 +112,8 @@ export const Experience: React.FC<ExperienceProps> = ({
           fingerRayOrigin={fingerRayOrigin}
           fingerRayDir={fingerRayDir}
           fingerDetected={indexFingerPos.detected}
-          isPinching={isPinching}
-          isPinchingRef={isPinchingRef}
+          isGrabbing={isGrabbing}
+          isGrabbingRef={isGrabbingRef}
           orbitOffsetRef={orbitOffsetRef}
           luckyPhoto={luckyPhoto}
         />
@@ -128,7 +128,7 @@ export const Experience: React.FC<ExperienceProps> = ({
         />
       </group>
 
-      <EffectComposer enableNormalPass={false}>
+      <EffectComposer enableNormalPass={false} resolutionScale={0.2}>
         <Bloom
           luminanceThreshold={0.8}
           mipmapBlur

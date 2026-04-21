@@ -8,7 +8,7 @@ interface GestureControllerProps {
   onHandPosition?: (x: number, y: number, detected: boolean) => void;
   onTwoHandsDetected?: (detected: boolean) => void;
   onIndexFingerPosition?: (x: number, y: number, detected: boolean) => void;
-  onPinchDetected?: (pinching: boolean) => void;
+  onGrabDetected?: (grabbing: boolean) => void;
   onSwipe?: (deltaX: number) => void;
 }
 
@@ -18,7 +18,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
   onHandPosition,
   onTwoHandsDetected,
   onIndexFingerPosition,
-  onPinchDetected,
+  onGrabDetected,
   onSwipe,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -31,13 +31,12 @@ export const GestureController: React.FC<GestureControllerProps> = ({
   // Debounce logic refs
   const openFrames = useRef(0);
   const closedFrames = useRef(0);
-  const CONFIDENCE_THRESHOLD = 5; // Number of consecutive frames to confirm gesture
+  const CONFIDENCE_THRESHOLD = 3; // Number of consecutive frames to confirm gesture
 
   // Index finger tracking for swipe detection
   const lastIndexXRef = useRef<number | null>(null);
-  const pinchActiveRef = useRef(false);
-  const PINCH_THRESHOLD = 0.04; // Normalized distance threshold for pinch
-  const SWIPE_THRESHOLD = 0.015; // Minimum delta to register as swipe
+  const grabActiveRef = useRef(false);
+  const SWIPE_THRESHOLD = 0.008; // Minimum delta to register as swipe (reduced from 0.015 for more sensitivity)
 
   useEffect(() => {
     let handLandmarker: HandLandmarker | null = null;
@@ -220,9 +219,9 @@ export const GestureController: React.FC<GestureControllerProps> = ({
           if (onIndexFingerPosition) {
             onIndexFingerPosition(0.5, 0.5, false);
           }
-          if (onPinchDetected && pinchActiveRef.current) {
-            pinchActiveRef.current = false;
-            onPinchDetected(false);
+          if (onGrabDetected && grabActiveRef.current) {
+            grabActiveRef.current = false;
+            onGrabDetected(false);
           }
           lastIndexXRef.current = null;
           // Clear canvas when no hand detected
@@ -278,28 +277,52 @@ export const GestureController: React.FC<GestureControllerProps> = ({
         onHandPosition(palmCenterX, palmCenterY, true);
       }
 
-      // --- Middle finger tip position (landmark 12) for cursor tracking ---
-      const middleTip = landmarks[12];
+      // --- Palm center position for cursor tracking ---
+      // Use palm center instead of middle finger for more stable tracking
       if (onIndexFingerPosition) {
-        onIndexFingerPosition(middleTip.x, middleTip.y, true);
+        onIndexFingerPosition(palmCenterX, palmCenterY, true);
       }
 
       const indexTip = landmarks[8];
 
-      // --- Pinch detection: thumb tip (4) to index tip (8) distance ---
-      const thumbTipLm = landmarks[4];
-      const indexTipLm = landmarks[8];
-      const dz = (thumbTipLm.z ?? 0) - (indexTipLm.z ?? 0);
-      const pinchDist = Math.hypot(
-        thumbTipLm.x - indexTipLm.x,
-        thumbTipLm.y - indexTipLm.y,
-        dz,
+      // --- Grab detection: check if all fingers are curled into a fist ---
+      const grabFingerTips = [8, 12, 16, 20]; // Index, Middle, Ring, Pinky tips
+      const grabFingerBases = [5, 9, 13, 17]; // MCP joints
+      const grabFingerPIPs = [6, 10, 14, 18]; // PIP joints (middle knuckle)
+
+      let curledFingers = 0;
+      for (let i = 0; i < 4; i++) {
+        const tip = landmarks[grabFingerTips[i]];
+        const pip = landmarks[grabFingerPIPs[i]];
+        const base = landmarks[grabFingerBases[i]];
+
+        // Calculate distance from tip to base
+        const distTipToBase = Math.hypot(tip.x - base.x, tip.y - base.y);
+        // Calculate distance from PIP to base (reference length)
+        const distPIPToBase = Math.hypot(pip.x - base.x, pip.y - base.y);
+
+        // If tip is closer to base than PIP is, finger is curled
+        if (distTipToBase < distPIPToBase * 1.3) {
+          curledFingers++;
+        }
+      }
+
+      // Thumb check: thumb tip (4) should be close to index base (5) when grabbing
+      const grabThumbTip = landmarks[4];
+      const grabIndexBase = landmarks[5];
+      const thumbToIndexDist = Math.hypot(
+        grabThumbTip.x - grabIndexBase.x,
+        grabThumbTip.y - grabIndexBase.y,
       );
-      const isPinching = pinchDist < PINCH_THRESHOLD;
-      if (isPinching !== pinchActiveRef.current) {
-        pinchActiveRef.current = isPinching;
-        if (onPinchDetected) {
-          onPinchDetected(isPinching);
+      const isThumbCurled = thumbToIndexDist < 0.18; // Threshold for thumb curl (increased from 0.15 for more sensitivity)
+
+      // Grab is detected when at least 2 fingers are curled and thumb is curled (reduced from 3 for more sensitivity)
+      const isGrabbing = curledFingers >= 2 && isThumbCurled;
+
+      if (isGrabbing !== grabActiveRef.current) {
+        grabActiveRef.current = isGrabbing;
+        if (onGrabDetected) {
+          onGrabDetected(isGrabbing);
         }
       }
 
@@ -348,9 +371,9 @@ export const GestureController: React.FC<GestureControllerProps> = ({
       if (distThumbTip > distThumbBase * 1.2) extendedFingers++;
 
       // DECISION
-      // When pinching, skip mode-change gestures so pinch doesn't trigger fist/open
-      if (isPinching) {
-        setGestureStatus("Detected: PINCH");
+      // When grabbing, skip mode-change gestures so grab doesn't trigger fist/open
+      if (isGrabbing) {
+        setGestureStatus("Detected: GRAB");
         openFrames.current = 0;
         closedFrames.current = 0;
       } else if (extendedFingers >= 4) {

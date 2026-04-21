@@ -76,14 +76,14 @@ export default function App() {
   } | null>(null);
   const [pickedNames, setPickedNames] = useState<string[]>([]);
 
-  // New state for finger pointer, pinch, swipe
+  // New state for finger pointer, grab, swipe
   const [indexFingerPos, setIndexFingerPos] = useState<{
     x: number;
     y: number;
     detected: boolean;
   }>({ x: 0.5, y: 0.5, detected: false });
-  const [isPinching, setIsPinching] = useState(false);
-  const isPinchingRef = useRef(false);
+  const [isGrabbing, setIsGrabbing] = useState(false);
+  const isGrabbingRef = useRef(false);
   const isFirstChaosRef = useRef(true);
   const isChaosReadyRef = useRef(false);
 
@@ -136,9 +136,9 @@ export default function App() {
 
     loadSharedPhotos();
 
-    setTimeout(()=> {
-      isChaosReadyRef.current = true
-    }, 5000)
+    setTimeout(() => {
+      isChaosReadyRef.current = true;
+    }, 5000);
   }, []);
 
   const toggleMode = () => {
@@ -148,8 +148,8 @@ export default function App() {
   };
 
   const handleSetMode = (mode: React.SetStateAction<TreeMode>) => {
-    if(isChaosReadyRef.current) setMode(mode);
-  }
+    if (isChaosReadyRef.current) setMode(mode);
+  };
 
   const handleHandPosition = (x: number, y: number, detected: boolean) => {
     setHandPosition({ x, y, detected });
@@ -167,9 +167,9 @@ export default function App() {
     setIndexFingerPos({ x, y, detected });
   };
 
-  const handlePinchDetected = (pinching: boolean) => {
-    isPinchingRef.current = pinching;
-    setIsPinching(pinching);
+  const handleGrabDetected = (grabbing: boolean) => {
+    isGrabbingRef.current = grabbing;
+    setIsGrabbing(grabbing);
   };
 
   const handleSwipe = (deltaX: number) => {
@@ -184,9 +184,8 @@ export default function App() {
   useEffect(() => {
     if (mode === TreeMode.CHAOS) {
       // Start 2-second timer
-      chaosTimerRef.current = window.setTimeout(() => {
-      }, 2000);
-      if (isFirstChaosRef.current){
+      chaosTimerRef.current = window.setTimeout(() => {}, 2000);
+      if (isFirstChaosRef.current) {
         isFirstChaosRef.current = false;
         setLuckyBallsActive(true);
       }
@@ -222,20 +221,20 @@ export default function App() {
     setLuckyPhoto(null);
   };
 
-  // Ref for the close button to detect pinch-over-button
+  // Ref for the close button to detect grab-over-button
   const closeButtonRef = useRef<HTMLDivElement>(null);
 
-  // Close lucky photo when user pinches on the close button
+  // Close lucky photo when user grabs on the close button
   const handleCloseLuckyPhoto = useCallback(() => {
     setLuckyPhoto(null);
     setLuckyBallsActive(false);
   }, []);
 
-  // Detect pinch gesture over the close button
+  // Detect grab gesture over the close button
   useEffect(() => {
     if (
       !luckyPhoto ||
-      !isPinching ||
+      !isGrabbing ||
       !indexFingerPos.detected ||
       !closeButtonRef.current
     )
@@ -256,7 +255,7 @@ export default function App() {
     ) {
       handleCloseLuckyPhoto();
     }
-  }, [luckyPhoto, isPinching, indexFingerPos, handleCloseLuckyPhoto]);
+  }, [luckyPhoto, isGrabbing, indexFingerPos, handleCloseLuckyPhoto]);
 
   const handlePhotosUpload = (photos: string[]) => {
     setUploadedPhotos(photos);
@@ -266,9 +265,14 @@ export default function App() {
     <div className="w-full h-screen relative bg-gradient-to-b from-black via-[#001a0d] to-[#0a2f1e]">
       <ErrorBoundary>
         <Canvas
-          dpr={[1, 1]}
+          dpr={[0.5, 0.75]}
           camera={{ position: [0, 4, 20], fov: 45 }}
-          gl={{ antialias: false, stencil: false, alpha: false }}
+          gl={{
+            antialias: false,
+            stencil: false,
+            alpha: false,
+            powerPreference: "low-power",
+          }}
           shadows
         >
           <Suspense fallback={null}>
@@ -283,8 +287,8 @@ export default function App() {
               onLuckyPhotoSelected={handleLuckyPhotoSelected}
               onLuckyBallsDone={handleLuckyBallsDone}
               indexFingerPos={indexFingerPos}
-              isPinching={isPinching}
-              isPinchingRef={isPinchingRef}
+              isGrabbing={isGrabbing}
+              isGrabbingRef={isGrabbingRef}
               orbitOffsetRef={orbitOffsetRef}
             />
           </Suspense>
@@ -324,7 +328,7 @@ export default function App() {
         onHandPosition={handleHandPosition}
         onTwoHandsDetected={handleTwoHandsDetected}
         onIndexFingerPosition={handleIndexFingerPosition}
-        onPinchDetected={handlePinchDetected}
+        onGrabDetected={handleGrabDetected}
         onSwipe={handleSwipe}
       />
 
@@ -340,12 +344,12 @@ export default function App() {
         >
           <div
             className={`w-6 h-6 rounded-full border-2 transition-all duration-100 ${
-              isPinching
+              isGrabbing
                 ? "border-red-400 bg-red-400/40 scale-75"
                 : "border-[#D4AF37] bg-[#D4AF37]/20"
             }`}
             style={{
-              boxShadow: isPinching
+              boxShadow: isGrabbing
                 ? "0 0 16px rgba(248,113,113,0.6)"
                 : "0 0 16px rgba(212,175,55,0.5)",
             }}
