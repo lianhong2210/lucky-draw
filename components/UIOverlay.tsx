@@ -37,7 +37,7 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ pickedNames }) => {
             )}
             <button
               onClick={() => setIsPickedListExpanded(!isPickedListExpanded)}
-              className="w-6 h-6 flex items-center justify-center bg-white border border-[#D4AF37] rounded-md text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white transition-colors leading-none"
+              className="w-6 h-6 flex items-center justify-center bg-[#F5E6BF] border border-[#D4AF37] rounded-md text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#F5E6BF] transition-colors leading-none"
               aria-label={
                 isPickedListExpanded
                   ? "Collapse picked list"
