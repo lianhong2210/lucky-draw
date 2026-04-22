@@ -36,7 +36,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
   // Palm center tracking for swipe detection
   const lastPalmXRef = useRef<number | null>(null);
   const grabActiveRef = useRef(false);
-  const SWIPE_THRESHOLD = 0.008; // Minimum delta to register as swipe (reduced from 0.015 for more sensitivity)
+  const SWIPE_THRESHOLD = 0.025; // Minimum delta to register as swipe (reduced from 0.015 for more sensitivity)
 
   useEffect(() => {
     let handLandmarker: HandLandmarker | null = null;
