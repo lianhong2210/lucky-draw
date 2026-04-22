@@ -90,30 +90,22 @@ interface BallState {
 
 interface LuckyBalls3DProps {
   active: boolean;
-  twoHandsDetected: boolean;
-  uploadedPhotos: string[];
   onPhotoSelected: (photo: { name: string; imageUrl: string } | null) => void;
-  onDone: () => void;
-  fingerRayOrigin: React.RefObject<THREE.Vector3>;
-  fingerRayDir: React.RefObject<THREE.Vector3>;
-  fingerDetected: boolean;
+  palmRayOrigin: React.RefObject<THREE.Vector3>;
+  palmRayDir: React.RefObject<THREE.Vector3>;
+  handPositionDetected: boolean;
   isGrabbing: boolean;
-  isGrabbingRef: React.RefObject<boolean>;
-  orbitOffsetRef: React.RefObject<number>;
+  orbitOffsetRef: number;
   luckyPhoto: { name: string; imageUrl: string };
 }
 
 export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   active,
-  twoHandsDetected,
-  uploadedPhotos,
   onPhotoSelected,
-  onDone,
-  fingerRayOrigin,
-  fingerRayDir,
-  fingerDetected,
+  palmRayOrigin,
+  palmRayDir,
+  handPositionDetected,
   isGrabbing,
-  isGrabbingRef,
   orbitOffsetRef,
   luckyPhoto,
 }) => {
@@ -128,7 +120,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   const phaseRef = useRef<"IDLE" | "ACTIVE" | "EXPLODING" | "DONE">("IDLE");
   const hasTriggeredRef = useRef(false);
   const autoRotationRef = useRef(0);
-  const pinchCooldownRef = useRef(0);
+  const grabCooldownRef = useRef(0);
   const ballLertRef = useRef(0.5);
   const isBallReadyRef = useRef(false);
 
@@ -248,13 +240,13 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
 
   useFrame((state) => {
     if (
-      isGrabbingRef.current &&
+      isGrabbing &&
       !luckyPhoto &&
       isBallReadyRef.current &&
       highlightedRef.current >= 0 &&
       phaseRef.current === "ACTIVE" &&
       pickedRef.current < 0 &&
-      pinchCooldownRef.current <= 0
+      grabCooldownRef.current <= 0
     ) {
       const ballCount = getBallCountWithBatch();
       if (ballCount === 0) return;
@@ -262,7 +254,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
       if (ballStates.current[idx].phase === "ORBITING") {
         pickedRef.current = idx;
         ballStates.current[idx].phase = "PICKED";
-        pinchCooldownRef.current = 1; // 1-second cooldown
+        grabCooldownRef.current = 1; // 1-second cooldown
       }
     }
     const t = state.clock.elapsedTime;
@@ -272,21 +264,21 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
     if (phaseRef.current === "IDLE") return;
 
     // Decrease pinch cooldown
-    if (pinchCooldownRef.current > 0) {
-      pinchCooldownRef.current -= delta;
+    if (grabCooldownRef.current > 0) {
+      grabCooldownRef.current -= delta;
     }
 
     // Auto-rotation
     autoRotationRef.current += delta * 0.3;
-    const orbitOffset = autoRotationRef.current + (orbitOffsetRef.current || 0);
+    const orbitOffset = autoRotationRef.current + (orbitOffsetRef || 0);
 
     // --- Find closest ball to finger ray ---
     let closestIdx = -1;
     let closestDist = Infinity;
 
-    if (fingerDetected && pickedRef.current < 0) {
-      const rayOrigin = fingerRayOrigin.current;
-      const rayDir = fingerRayDir.current;
+    if (handPositionDetected && pickedRef.current < 0) {
+      const rayOrigin = palmRayOrigin.current;
+      const rayDir = palmRayDir.current;
 
       const ballCountForRay = ballStates.current.length;
       if (ballCountForRay === 0) return;
@@ -324,11 +316,11 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
 
     if (luckyPhoto && !readyToNextBatchRef.current) {
       readyToNextBatchRef.current = true;
-      pinchCooldownRef.current = 1;
+      grabCooldownRef.current = 1;
     }
     if (!luckyPhoto && readyToNextBatchRef.current) {
       readyToNextBatchRef.current = false;
-      pinchCooldownRef.current = 1; // prevent the close-pinch from picking a ball
+      grabCooldownRef.current = 1; // prevent the close-pinch from picking a ball
       // Don't reset all balls - just allow picking the next one
       pickedRef.current = -1;
       highlightedRef.current = -1;

@@ -8,21 +8,21 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ pickedNames }) => {
   const [isPickedListExpanded, setIsPickedListExpanded] = useState(false);
 
   // Helper function to convert base64 to Blob
-  const base64ToBlob = (base64: string): Blob => {
-    const byteString = atob(base64.split(",")[1]);
-    const mimeString = base64.split(",")[0].split(":")[1].split(";")[0];
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-    return new Blob([ab], { type: mimeString });
-  };
+  // const base64ToBlob = (base64: string): Blob => {
+  //   const byteString = atob(base64.split(",")[1]);
+  //   const mimeString = base64.split(",")[0].split(":")[1].split(";")[0];
+  //   const ab = new ArrayBuffer(byteString.length);
+  //   const ia = new Uint8Array(ab);
+  //   for (let i = 0; i < byteString.length; i++) {
+  //     ia[i] = byteString.charCodeAt(i);
+  //   }
+  //   return new Blob([ab], { type: mimeString });
+  // };
 
-  const handleCreateMine = () => {
-    // 清除 URL 参数，刷新页面
-    window.location.href = window.location.origin;
-  };
+  // const handleCreateMine = () => {
+  //   // 清除 URL 参数，刷新页面
+  //   window.location.href = window.location.origin;
+  // };
 
   return (
     <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-10">

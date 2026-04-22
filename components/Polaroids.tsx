@@ -26,8 +26,7 @@ const PHOTO_COUNT = 22; // How many polaroid frames to generate
 interface PolaroidsProps {
   mode: TreeMode;
   uploadedPhotos: string[];
-  twoHandsDetected: boolean;
-  onClosestPhotoChange?: (photoUrl: string | null) => void;
+  onClosestPhotoChange?: (photoUrl: string | null) => void; // Currently Not Used
 }
 
 interface PhotoData {
@@ -191,11 +190,9 @@ const PolaroidItem: React.FC<{
 export const Polaroids: React.FC<PolaroidsProps> = ({
   mode,
   uploadedPhotos,
-  twoHandsDetected,
   onClosestPhotoChange,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
-  const [closestPhotoIndex, setClosestPhotoIndex] = React.useState<number>(0);
 
   const photoData = useMemo(() => {
     // Don't render any photos if none are uploaded
@@ -255,9 +252,9 @@ export const Polaroids: React.FC<PolaroidsProps> = ({
     return data;
   }, [uploadedPhotos]);
 
-  // Update closest photo every frame when two hands are detected
+  // Update closest photo every frame
   useFrame((state) => {
-    if (twoHandsDetected && groupRef.current && photoData.length > 0) {
+    if (groupRef.current && photoData.length > 0) {
       // Get camera position in world coordinates
       const cameraPos = state.camera.position.clone();
 
@@ -278,8 +275,6 @@ export const Polaroids: React.FC<PolaroidsProps> = ({
           }
         }
       });
-
-      setClosestPhotoIndex(closestIndex);
 
       // Notify parent component about the closest photo
       if (onClosestPhotoChange) {

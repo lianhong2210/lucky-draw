@@ -6,8 +6,6 @@ interface GestureControllerProps {
   onModeChange: (mode: TreeMode) => void;
   currentMode: TreeMode;
   onHandPosition?: (x: number, y: number, detected: boolean) => void;
-  onTwoHandsDetected?: (detected: boolean) => void;
-  onIndexFingerPosition?: (x: number, y: number, detected: boolean) => void;
   onGrabDetected?: (grabbing: boolean) => void;
   onSwipe?: (deltaX: number) => void;
 }
@@ -16,17 +14,15 @@ export const GestureController: React.FC<GestureControllerProps> = ({
   onModeChange,
   currentMode,
   onHandPosition,
-  onTwoHandsDetected,
-  onIndexFingerPosition,
   onGrabDetected,
   onSwipe,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [gestureStatus, setGestureStatus] = useState<string>("Initializing...");
   const [handPos, setHandPos] = useState<{ x: number; y: number } | null>(null);
   const lastModeRef = useRef<TreeMode>(currentMode);
+  // const [gestureStatus, setGestureStatus] = useState<string>("Initializing...");
 
   // Debounce logic refs
   const openFrames = useRef(0);
@@ -66,7 +62,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
         console.warn(
           "Gesture control is unavailable. The app will still work without it.",
         );
-        setGestureStatus("Gesture control unavailable");
+        // setGestureStatus("Gesture control unavailable");
         // Don't block the app if gesture control fails
       }
     };
@@ -82,11 +78,11 @@ export const GestureController: React.FC<GestureControllerProps> = ({
             videoRef.current.srcObject = stream;
             videoRef.current.addEventListener("loadeddata", predictWebcam);
             setIsLoaded(true);
-            setGestureStatus("Waiting for hand...");
+            // setGestureStatus("Waiting for hand...");
           }
         } catch (err) {
           console.error("Error accessing webcam:", err);
-          setGestureStatus("Permission Denied");
+          // setGestureStatus("Permission Denied");
         }
       }
     };
@@ -195,12 +191,6 @@ export const GestureController: React.FC<GestureControllerProps> = ({
         );
 
         if (result.landmarks && result.landmarks.length > 0) {
-          // Check if two hands are detected
-          const twoHandsDetected = result.landmarks.length >= 2;
-          if (onTwoHandsDetected) {
-            onTwoHandsDetected(twoHandsDetected);
-          }
-
           // Draw all detected hands at once
           drawAllHands(result.landmarks);
 
@@ -208,17 +198,12 @@ export const GestureController: React.FC<GestureControllerProps> = ({
           const landmarks = result.landmarks[0];
           detectGesture(landmarks);
         } else {
-          setGestureStatus("No hand detected");
+          // setGestureStatus("No hand detected");
           setHandPos(null); // Clear hand position when no hand detected
           if (onHandPosition) {
             onHandPosition(0.5, 0.5, false); // No hand detected
           }
-          if (onTwoHandsDetected) {
-            onTwoHandsDetected(false);
-          }
-          if (onIndexFingerPosition) {
-            onIndexFingerPosition(0.5, 0.5, false);
-          }
+
           if (onGrabDetected && grabActiveRef.current) {
             grabActiveRef.current = false;
             onGrabDetected(false);
@@ -270,20 +255,13 @@ export const GestureController: React.FC<GestureControllerProps> = ({
           landmarks[17].y) /
         5;
 
-      // Send hand position for camera control
+      // Send hand position for camera control (Palm center position for cursor tracking)
       // Normalize coordinates: x and y are in [0, 1], center at (0.5, 0.5)
+      // Use palm center instead of middle finger for more stable tracking
       setHandPos({ x: palmCenterX, y: palmCenterY });
       if (onHandPosition) {
         onHandPosition(palmCenterX, palmCenterY, true);
       }
-
-      // --- Palm center position for cursor tracking ---
-      // Use palm center instead of middle finger for more stable tracking
-      if (onIndexFingerPosition) {
-        onIndexFingerPosition(palmCenterX, palmCenterY, true);
-      }
-
-      const indexTip = landmarks[8];
 
       // --- Grab detection: check if all fingers are curled into a fist ---
       const grabFingerTips = [8, 12, 16, 20]; // Index, Middle, Ring, Pinky tips
@@ -372,7 +350,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
       // DECISION
       // When grabbing, skip mode-change gestures so grab doesn't trigger fist/open
       if (isGrabbing) {
-        setGestureStatus("Detected: GRAB");
+        // setGestureStatus("Detected: GRAB");
         openFrames.current = 0;
         closedFrames.current = 0;
       } else if (extendedFingers >= 4) {
@@ -380,7 +358,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
         openFrames.current++;
         closedFrames.current = 0;
 
-        setGestureStatus("Detected: OPEN (Unleash)");
+        // setGestureStatus("Detected: OPEN (Unleash)");
 
         if (openFrames.current > CONFIDENCE_THRESHOLD) {
           if (lastModeRef.current !== TreeMode.CHAOS) {
@@ -393,7 +371,7 @@ export const GestureController: React.FC<GestureControllerProps> = ({
         closedFrames.current++;
         openFrames.current = 0;
 
-        setGestureStatus("Detected: CLOSED (Restore)");
+        // setGestureStatus("Detected: CLOSED (Restore)");
 
         if (closedFrames.current > CONFIDENCE_THRESHOLD) {
           if (lastModeRef.current !== TreeMode.FORMED) {

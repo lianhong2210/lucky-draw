@@ -65,10 +65,6 @@ export default function App() {
     detected: boolean;
   }>({ x: 0.5, y: 0.5, detected: false });
   const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
-  const [isLoadingShare, setIsLoadingShare] = useState(false);
-  const [isSharedView, setIsSharedView] = useState(false);
-  const [twoHandsDetected, setTwoHandsDetected] = useState(false);
-  const [closestPhoto, setClosestPhoto] = useState<string | null>(null);
   const [luckyBallsActive, setLuckyBallsActive] = useState(false);
   const [luckyPhoto, setLuckyPhoto] = useState<{
     name: string;
@@ -76,13 +72,7 @@ export default function App() {
   } | null>(null);
   const [pickedNames, setPickedNames] = useState<string[]>([]);
 
-  // New state for finger pointer, grab, swipe
-  const [indexFingerPos, setIndexFingerPos] = useState<{
-    x: number;
-    y: number;
-    detected: boolean;
-  }>({ x: 0.5, y: 0.5, detected: false });
-  const [isGrabbing, setIsGrabbing] = useState(false);
+  // Ref for hand gesture
   const isGrabbingRef = useRef(false);
   const isFirstChaosRef = useRef(true);
   const isChaosReadyRef = useRef(false);
@@ -101,9 +91,6 @@ export default function App() {
       const shareId = urlParams.get("share");
 
       if (!shareId) return;
-
-      setIsSharedView(true);
-      setIsLoadingShare(true);
 
       try {
         // Try API first (works in vercel dev and production)
@@ -129,8 +116,6 @@ export default function App() {
         }
       } catch (error) {
         console.error("Error loading shared photos:", error);
-      } finally {
-        setIsLoadingShare(false);
       }
     };
 
@@ -141,12 +126,6 @@ export default function App() {
     }, 5000);
   }, []);
 
-  const toggleMode = () => {
-    handleSetMode((prev) =>
-      prev === TreeMode.FORMED ? TreeMode.CHAOS : TreeMode.FORMED,
-    );
-  };
-
   const handleSetMode = (mode: React.SetStateAction<TreeMode>) => {
     if (isChaosReadyRef.current) setMode(mode);
   };
@@ -155,29 +134,12 @@ export default function App() {
     setHandPosition({ x, y, detected });
   };
 
-  const handleTwoHandsDetected = (detected: boolean) => {
-    setTwoHandsDetected(detected);
-  };
-
-  const handleIndexFingerPosition = (
-    x: number,
-    y: number,
-    detected: boolean,
-  ) => {
-    setIndexFingerPos({ x, y, detected });
-  };
-
   const handleGrabDetected = (grabbing: boolean) => {
     isGrabbingRef.current = grabbing;
-    setIsGrabbing(grabbing);
   };
 
   const handleSwipe = (deltaX: number) => {
     orbitOffsetRef.current += deltaX * 25; // amplify swipe into orbit rotation
-  };
-
-  const handleClosestPhotoChange = (photoUrl: string | null) => {
-    setClosestPhoto(photoUrl);
   };
 
   // Track when logo explodes (mode goes to CHAOS) - after 2s, mark ready for lucky balls
@@ -202,11 +164,6 @@ export default function App() {
     };
   }, [mode]);
 
-  const handleLuckyBallsClose = () => {
-    setLuckyBallsActive(false);
-    setLuckyPhoto(null);
-  };
-
   const handleLuckyPhotoSelected = (
     photo: { name: string; imageUrl: string } | null,
   ) => {
@@ -214,11 +171,6 @@ export default function App() {
     if (photo) {
       setPickedNames((prev) => [...prev, photo.name]);
     }
-  };
-
-  const handleLuckyBallsDone = () => {
-    setLuckyBallsActive(false);
-    setLuckyPhoto(null);
   };
 
   // Ref for the close button to detect grab-over-button
@@ -234,16 +186,16 @@ export default function App() {
   useEffect(() => {
     if (
       !luckyPhoto ||
-      !isGrabbing ||
-      !indexFingerPos.detected ||
+      !isGrabbingRef.current ||
+      !handPosition.detected ||
       !closeButtonRef.current
     )
       return;
 
     const btn = closeButtonRef.current.getBoundingClientRect();
     // Convert finger pos (0-1 normalized, mirrored X) to screen pixels
-    const fingerX = (1 - indexFingerPos.x) * window.innerWidth;
-    const fingerY = indexFingerPos.y * window.innerHeight;
+    const fingerX = (1 - handPosition.x) * window.innerWidth;
+    const fingerY = handPosition.y * window.innerHeight;
 
     // Add generous hit area padding around the button
     const padding = 30;
@@ -255,11 +207,7 @@ export default function App() {
     ) {
       handleCloseLuckyPhoto();
     }
-  }, [luckyPhoto, isGrabbing, indexFingerPos, handleCloseLuckyPhoto]);
-
-  const handlePhotosUpload = (photos: string[]) => {
-    setUploadedPhotos(photos);
-  };
+  }, [luckyPhoto, isGrabbingRef.current, handPosition, handleCloseLuckyPhoto]);
 
   return (
     <div className="w-full h-screen relative bg-gradient-to-b from-black via-[#001a0d] to-[#0a2f1e]">
@@ -278,18 +226,13 @@ export default function App() {
           <Suspense fallback={null}>
             <Experience
               mode={mode}
-              handPosition={handPosition}
               uploadedPhotos={uploadedPhotos}
-              twoHandsDetected={twoHandsDetected}
-              onClosestPhotoChange={handleClosestPhotoChange}
               luckyBallsActive={luckyBallsActive}
               luckyPhoto={luckyPhoto}
               onLuckyPhotoSelected={handleLuckyPhotoSelected}
-              onLuckyBallsDone={handleLuckyBallsDone}
-              indexFingerPos={indexFingerPos}
-              isGrabbing={isGrabbing}
-              isGrabbingRef={isGrabbingRef}
-              orbitOffsetRef={orbitOffsetRef}
+              handPosition={handPosition}
+              isGrabbing={isGrabbingRef.current}
+              orbitOffsetRef={orbitOffsetRef.current}
             />
           </Suspense>
         </Canvas>
@@ -304,44 +247,33 @@ export default function App() {
 
       <UIOverlay pickedNames={pickedNames} />
 
-      {/* Loading indicator for shared photos */}
-      {isLoadingShare && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80">
-          <div className="text-[#D4AF37] font-serif text-xl">
-            加载分享的照片中...
-          </div>
-        </div>
-      )}
-
       {/* Gesture Control Module */}
       <GestureController
         currentMode={mode}
         onModeChange={handleSetMode}
         onHandPosition={handleHandPosition}
-        onTwoHandsDetected={handleTwoHandsDetected}
-        onIndexFingerPosition={handleIndexFingerPosition}
         onGrabDetected={handleGrabDetected}
         onSwipe={handleSwipe}
       />
 
       {/* Finger Pointer Overlay - follows index finger */}
-      {indexFingerPos.detected && (
+      {handPosition.detected && (
         <div
           className="fixed z-[60] pointer-events-none"
           style={{
-            left: `${(1 - indexFingerPos.x) * 100}%`,
-            top: `${indexFingerPos.y * 100}%`,
+            left: `${(1 - handPosition.x) * 100}%`,
+            top: `${handPosition.y * 100}%`,
             transform: "translate(-50%, -50%)",
           }}
         >
           <div
             className={`w-6 h-6 rounded-full border-2 transition-all duration-100 ${
-              isGrabbing
+              isGrabbingRef.current
                 ? "border-red-400 bg-red-400/40 scale-75"
                 : "border-[#D4AF37] bg-[#D4AF37]/20"
             }`}
             style={{
-              boxShadow: isGrabbing
+              boxShadow: isGrabbingRef.current
                 ? "0 0 16px rgba(248,113,113,0.6)"
                 : "0 0 16px rgba(212,175,55,0.5)",
             }}

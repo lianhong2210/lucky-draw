@@ -1,69 +1,59 @@
-import React, { useRef } from "react";
-import { Environment, OrbitControls, ContactShadows } from "@react-three/drei";
+import { ContactShadows, Environment, OrbitControls } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import {
-  EffectComposer,
   Bloom,
-  Vignette,
+  EffectComposer,
   Noise,
+  Vignette,
 } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
-import { useFrame, useThree } from "@react-three/fiber";
-import { Foliage } from "./Foliage";
-import { LogoOrnaments } from "./Ornaments";
-import { Polaroids } from "./Polaroids";
-import { LuckyBalls3D } from "./LuckyBalls";
-import { TreeMode } from "../types";
+import React, { useRef } from "react";
 import * as THREE from "three";
+import { TreeMode } from "../types";
+import { Foliage } from "./Foliage";
+import { LuckyBalls3D } from "./LuckyBalls";
+import { Polaroids } from "./Polaroids";
 
 interface ExperienceProps {
   mode: TreeMode;
-  handPosition: { x: number; y: number; detected: boolean };
   uploadedPhotos: string[];
-  twoHandsDetected: boolean;
-  onClosestPhotoChange?: (photoUrl: string | null) => void;
+  onClosestPhotoChange?: (photoUrl: string | null) => void; // Currently Not Used
   luckyBallsActive: boolean;
   luckyPhoto: { name: string; imageUrl: string };
   onLuckyPhotoSelected: (
     photo: { name: string; imageUrl: string } | null,
   ) => void;
-  onLuckyBallsDone: () => void;
-  indexFingerPos: { x: number; y: number; detected: boolean };
+  handPosition: { x: number; y: number; detected: boolean };
   isGrabbing: boolean;
-  isGrabbingRef: React.RefObject<boolean>;
-  orbitOffsetRef: React.RefObject<number>;
+  orbitOffsetRef: number;
 }
 
 export const Experience: React.FC<ExperienceProps> = ({
   mode,
-  handPosition,
   uploadedPhotos,
-  twoHandsDetected,
-  onClosestPhotoChange,
   luckyBallsActive,
   luckyPhoto,
   onLuckyPhotoSelected,
-  onLuckyBallsDone,
-  indexFingerPos,
+  handPosition,
   isGrabbing,
-  isGrabbingRef,
   orbitOffsetRef,
 }) => {
   const controlsRef = useRef<any>(null);
   const raycaster = useRef(new THREE.Raycaster());
-  const fingerRayOrigin = useRef(new THREE.Vector3());
-  const fingerRayDir = useRef(new THREE.Vector3());
+  const palmRayOrigin = useRef(new THREE.Vector3());
+  const palmRayDir = useRef(new THREE.Vector3());
 
-  // Update finger raycaster only - camera stays fixed
+  // Update palm raycaster only - camera stays fixed
   useFrame(() => {
     const camera = controlsRef.current?.object;
-    if (camera && indexFingerPos.detected) {
-      // Convert mirrored finger position to NDC (-1 to 1)
-      const ndcX = (1 - indexFingerPos.x - 0.5) * 2;
-      const ndcY = -(indexFingerPos.y - 0.5) * 2;
+    if (camera && handPosition.detected) {
+      // Convert mirrored palm position to NDC (-1 to 1)
+      const ndcX = (1 - handPosition.x - 0.5) * 2;
+      const ndcY = -(handPosition.y - 0.5) * 2;
       const ndc = new THREE.Vector2(ndcX, ndcY);
       raycaster.current.setFromCamera(ndc, camera);
-      fingerRayOrigin.current.copy(raycaster.current.ray.origin);
-      fingerRayDir.current.copy(raycaster.current.ray.direction);
+      palmRayOrigin.current.copy(raycaster.current.ray.origin);
+      palmRayDir.current.copy(raycaster.current.ray.direction);
     }
   });
   return (
@@ -97,23 +87,14 @@ export const Experience: React.FC<ExperienceProps> = ({
       <group position={[0, -5, 0]}>
         <Foliage mode={mode} count={3500} />
         {/* <LogoOrnaments mode={mode} count={400} /> */}
-        <Polaroids
-          mode={mode}
-          uploadedPhotos={uploadedPhotos}
-          twoHandsDetected={twoHandsDetected}
-          onClosestPhotoChange={onClosestPhotoChange}
-        />
+        <Polaroids mode={mode} uploadedPhotos={uploadedPhotos} />
         <LuckyBalls3D
           active={luckyBallsActive}
-          twoHandsDetected={twoHandsDetected}
-          uploadedPhotos={uploadedPhotos}
           onPhotoSelected={onLuckyPhotoSelected}
-          onDone={onLuckyBallsDone}
-          fingerRayOrigin={fingerRayOrigin}
-          fingerRayDir={fingerRayDir}
-          fingerDetected={indexFingerPos.detected}
+          palmRayOrigin={palmRayOrigin}
+          palmRayDir={palmRayDir}
+          handPositionDetected={handPosition.detected}
           isGrabbing={isGrabbing}
-          isGrabbingRef={isGrabbingRef}
           orbitOffsetRef={orbitOffsetRef}
           luckyPhoto={luckyPhoto}
         />
