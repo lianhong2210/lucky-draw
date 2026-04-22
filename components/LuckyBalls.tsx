@@ -262,7 +262,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
       if (ballStates.current[idx].phase === "ORBITING") {
         pickedRef.current = idx;
         ballStates.current[idx].phase = "PICKED";
-        pinchCooldownRef.current = 1; // 4-second cooldown
+        pinchCooldownRef.current = 1; // 1-second cooldown
       }
     }
     const t = state.clock.elapsedTime;
