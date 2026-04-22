@@ -20,8 +20,8 @@ const BALL_RADIUS = 0.6;
 
 // Distribute balls across 2 orbit rings at different heights
 const INITIAL_ORBIT_RINGS = [
-  { y: 3, radius: 30, count: 10, speed: 4 }, // Lower ring - wider
-  { y: 7, radius: 30, count: 10, speed: 3 }, // Upper ring - tighter, opposite dir
+  { y: 3, radius: 30, count: 8, speed: 4 }, // Lower ring - wider
+  { y: 7, radius: 30, count: 8, speed: 3 }, // Upper ring - tighter, opposite dir
 ];
 const ORBIT_RINGS = [
   { y: 3, radius: 7.5, count: 8, speed: 0 }, // Lower ring - wider

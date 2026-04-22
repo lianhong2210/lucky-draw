@@ -27,6 +27,7 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({
   const [shareError, setShareError] = useState<string>("");
   const [copied, setCopied] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string>("");
+  const [isPickedListExpanded, setIsPickedListExpanded] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -240,24 +241,42 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({
       {/* Picked Names List - Left Side */}
       {pickedNames.length > 0 && (
         <div className="absolute top-24 left-8 pointer-events-auto w-[200px]">
-          <h2 className="text-lg font-serif text-[#D4AF37] tracking-wider mb-1 drop-shadow-lg">
-            Picked
-          </h2>
-          <div className="flex flex-col gap-2 max-h-[70vh] overflow-y-auto">
-            {pickedNames.map((name, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-2 px-3 py-1.5 bg-black/60 backdrop-blur-sm border border-[#D4AF37]/40 rounded-sm animate-fade-in"
-              >
-                <span className="text-[#D4AF37] font-serif text-sm font-bold min-w-[20px]">
-                  {i + 1}.
-                </span>
-                <span className="text-[#F5E6BF] font-serif text-sm tracking-wide">
-                  {name}
-                </span>
-              </div>
-            ))}
+          <div className="flex items-center justify-between mb-1">
+            {isPickedListExpanded && (
+              <h2 className="text-lg font-serif text-[#D4AF37] tracking-wider drop-shadow-lg">
+                Picked
+              </h2>
+            )}
+            <button
+              onClick={() => setIsPickedListExpanded(!isPickedListExpanded)}
+              className="w-6 h-6 flex items-center justify-center bg-white border border-[#D4AF37] rounded-md text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white transition-colors leading-none"
+              aria-label={
+                isPickedListExpanded
+                  ? "Collapse picked list"
+                  : "Expand picked list"
+              }
+            >
+              {isPickedListExpanded ? "-" : "+"}
+            </button>
           </div>
+
+          {isPickedListExpanded && (
+            <div className="flex flex-col gap-2 max-h-[70vh] overflow-y-auto">
+              {pickedNames.map((name, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-black/60 backdrop-blur-sm border border-[#D4AF37]/40 rounded-sm animate-fade-in"
+                >
+                  <span className="text-[#D4AF37] font-serif text-sm font-bold min-w-[20px]">
+                    {i + 1}.
+                  </span>
+                  <span className="text-[#F5E6BF] font-serif text-sm tracking-wide">
+                    {name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
