@@ -302,15 +302,7 @@ export default function App() {
         dataStyles={{ color: "#D4AF37", fontFamily: "Cinzel" }}
       />
 
-      <UIOverlay
-        mode={mode}
-        onToggle={toggleMode}
-        onPhotosUpload={handlePhotosUpload}
-        hasPhotos={uploadedPhotos.length > 0}
-        uploadedPhotos={uploadedPhotos}
-        isSharedView={isSharedView}
-        pickedNames={pickedNames}
-      />
+      <UIOverlay pickedNames={pickedNames} />
 
       {/* Loading indicator for shared photos */}
       {isLoadingShare && (
