@@ -139,7 +139,7 @@ export default function App() {
   };
 
   const handleSwipe = (deltaX: number) => {
-    orbitOffsetRef.current += deltaX * 25; // amplify swipe into orbit rotation
+    orbitOffsetRef.current += deltaX * 35; // amplify swipe into orbit rotation
   };
 
   // Track when logo explodes (mode goes to CHAOS) - after 2s, mark ready for lucky balls
