@@ -78,7 +78,6 @@ export default function App() {
     department: string;
   } | null>(null);
   const [pickedNames, setPickedNames] = useState<string[]>([]);
-  const [isXButtonHovered, setIsXButtonHovered] = useState(false);
   const [pickedResetCount, setPickedResetCount] = useState(0);
 
   // Ref for hand gesture
@@ -93,6 +92,7 @@ export default function App() {
   >;
   const hasInitialized = useRef(false);
   const isXBtnReadyRef = useRef(false);
+  const isXButtonHovered = useRef(false);
 
   // Check for share parameter in URL on mount
   useEffect(() => {
@@ -224,7 +224,7 @@ export default function App() {
   // Detect grab gesture over the close button and hover state
   useEffect(() => {
     if (!luckyPhoto || !handPosition.detected || !closeButtonRef.current) {
-      setIsXButtonHovered(false);
+      isXButtonHovered.current = false;
       return;
     }
 
@@ -243,15 +243,22 @@ export default function App() {
       fingerY >= btn.top - padding &&
       fingerY <= btn.bottom + padding
     ) {
-      setIsXButtonHovered(true);
+      isXButtonHovered.current = true;
       // Trigger close on grab
       if (isGrabbingRef.current) {
         handleCloseLuckyPhoto();
       }
     } else {
-      setIsXButtonHovered(false);
+      isXButtonHovered.current = false;
     }
-  }, [luckyPhoto, isGrabbingRef.current, handPosition, handleCloseLuckyPhoto]);
+  }, [
+    luckyPhoto,
+    isGrabbingRef.current,
+    handPosition.detected,
+    handPosition.x,
+    handPosition.y,
+    handleCloseLuckyPhoto,
+  ]);
 
   return (
     <div className="w-full h-screen relative bg-gradient-to-b from-black via-[#001a0d] to-[#0a2f1e]">
@@ -361,7 +368,7 @@ export default function App() {
               ref={closeButtonRef}
               onClick={handleCloseLuckyPhoto}
               className={`absolute top-2 right-2 flex items-center justify-center w-10 h-10 rounded-full border-2 border-[#D4AF37] backdrop-blur-sm cursor-pointer pointer-events-auto transition-all duration-200 group ${
-                isXButtonHovered && !!isXBtnReadyRef.current
+                isXButtonHovered.current && !!isXBtnReadyRef.current
                   ? "bg-[#D4AF37] scale-110 shadow-[0_0_20px_rgba(212,175,55,0.6)]"
                   : "bg-black/60 hover:bg-[#D4AF37]"
               }`}
@@ -369,7 +376,7 @@ export default function App() {
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className={`w-5 h-5 transition-colors ${
-                  isXButtonHovered && !!isXBtnReadyRef.current
+                  isXButtonHovered.current && !!isXBtnReadyRef.current
                     ? "text-black"
                     : "text-[#D4AF37] group-hover:text-black"
                 }`}
