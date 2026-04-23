@@ -234,7 +234,7 @@ export default function App() {
     const fingerY = handPosition.y * window.innerHeight;
 
     // Add generous hit area padding around the button
-    const padding = 30;
+    const padding = 10;
 
     // Check if hand is hovering over the X button
     if (
