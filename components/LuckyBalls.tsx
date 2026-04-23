@@ -248,6 +248,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   useEffect(() => {
     if (pickedResetCount === 0) return; // skip initial mount
     photos.current = [...PhotoListing];
+    assignBallPosition();
   }, [pickedResetCount]);
 
   // const cleanup = useCallback(() => {
