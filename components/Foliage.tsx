@@ -87,6 +87,7 @@ const fragmentShader = `
 export const Foliage: React.FC<FoliageProps> = ({ mode, count }) => {
   const meshRef = useRef<THREE.Points>(null);
   const targetAttrRef = useRef<THREE.BufferAttribute | null>(null);
+  const [isLoaded, setIsLoaded] = React.useState(false);
 
   // Target progress reference for smooth JS-side dampening logic for the uniform
   const progressRef = useRef(0);
@@ -95,11 +96,6 @@ export const Foliage: React.FC<FoliageProps> = ({ mode, count }) => {
     const chaos = new Float32Array(count * 3);
     const target = new Float32Array(count * 3);
     const rnd = new Float32Array(count);
-
-    // Initial fallback: Spiral Cone (used until SVG loads)
-    const goldenRatio = (1 + Math.sqrt(5)) / 2;
-    const height = 12;
-    const maxRadius = 5;
 
     for (let i = 0; i < count; i++) {
       // 1. Chaos Positions: Random sphere
@@ -111,15 +107,10 @@ export const Foliage: React.FC<FoliageProps> = ({ mode, count }) => {
       chaos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) + 5; // Lift up slightly
       chaos[i * 3 + 2] = r * Math.cos(phi);
 
-      // 2. Target Positions: Spiral Cone (Fibonacci Lattice on Cone)
-      const yNorm = i / count;
-      const y = yNorm * height;
-      const currentRadius = maxRadius * (1 - yNorm);
-      const angle = 2 * Math.PI * goldenRatio * i;
-
-      target[i * 3] = Math.cos(angle) * currentRadius;
-      target[i * 3 + 1] = y;
-      target[i * 3 + 2] = Math.sin(angle) * currentRadius;
+      // 2. Target Positions: Will be filled by SVG
+      target[i * 3] = 0;
+      target[i * 3 + 1] = 0;
+      target[i * 3 + 2] = 0;
 
       // 3. Randoms
       rnd[i] = Math.random();
@@ -132,7 +123,7 @@ export const Foliage: React.FC<FoliageProps> = ({ mode, count }) => {
     };
   }, [count]);
 
-  // Once SVG loads, overwrite target positions in the buffer attribute
+  // Load SVG and update target positions
   useEffect(() => {
     loadSvgCandidates().then((candidates) => {
       if (candidates.length === 0) return;
@@ -140,6 +131,7 @@ export const Foliage: React.FC<FoliageProps> = ({ mode, count }) => {
       if (targetAttrRef.current) {
         targetAttrRef.current.needsUpdate = true;
       }
+      setIsLoaded(true);
     });
   }, [targetPositions, count]);
 
@@ -168,6 +160,11 @@ export const Foliage: React.FC<FoliageProps> = ({ mode, count }) => {
       material.uniforms.uProgress.value = progressRef.current;
     }
   });
+
+  // Don't render until SVG is loaded
+  if (!isLoaded) {
+    return null;
+  }
 
   return (
     <points ref={meshRef}>
