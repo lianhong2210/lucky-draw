@@ -149,19 +149,12 @@ export default function App() {
   // Track when logo explodes (mode goes to CHAOS) - after 2s, mark ready for lucky balls
   useEffect(() => {
     if (mode === TreeMode.CHAOS) {
-      // Start 2-second timer
-      chaosTimerRef.current = window.setTimeout(() => {}, 2000);
+      // Start 3-second timer
+      chaosTimerRef.current = window.setTimeout(() => {}, 3000);
       if (isFirstChaosRef.current) {
         isFirstChaosRef.current = false;
         setLuckyBallsActive(true);
       }
-    } else {
-      // Mode went back to FORMED - cancel timer and reset
-      if (chaosTimerRef.current) {
-        clearTimeout(chaosTimerRef.current);
-        chaosTimerRef.current = null;
-      }
-      luckyBallsUsedRef.current = false; // reset so it can trigger again next chaos
     }
     return () => {
       if (chaosTimerRef.current) clearTimeout(chaosTimerRef.current);
