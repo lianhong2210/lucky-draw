@@ -21,11 +21,11 @@ const BALL_RADIUS = 0.6;
 // Distribute balls across 2 orbit rings at different heights
 const INITIAL_ORBIT_RINGS = [
   { y: 3, radius: 30, count: 8, speed: 4 }, // Lower ring - wider
-  { y: 7, radius: 30, count: 8, speed: 3 }, // Upper ring - tighter, opposite dir
+  { y: 7, radius: 25, count: 8, speed: -4 }, // Upper ring - tighter, opposite dir
 ];
 const ORBIT_RINGS = [
   { y: 3, radius: 7.5, count: 8, speed: 0 }, // Lower ring - wider
-  { y: 7, radius: 6, count: 8, speed: -0.05 }, // Upper ring - tighter, opposite dir
+  { y: 7, radius: 6, count: 8, speed: 0 }, // Upper ring - tighter, opposite dir
 ];
 const BALL_COUNT = ORBIT_RINGS.reduce((acc, cur) => (acc += cur.count), 0);
 
@@ -269,7 +269,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
     }
 
     // Auto-rotation
-    autoRotationRef.current += delta * 0.3;
+    // autoRotationRef.current += delta * 0.3;
     const orbitOffset = autoRotationRef.current + (orbitOffsetRef || 0);
 
     // --- Find closest ball to finger ray ---

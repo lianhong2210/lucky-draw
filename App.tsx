@@ -71,6 +71,7 @@ export default function App() {
     imageUrl: string;
   } | null>(null);
   const [pickedNames, setPickedNames] = useState<string[]>([]);
+  const [isXButtonHovered, setIsXButtonHovered] = useState(false);
 
   // Ref for hand gesture
   const isGrabbingRef = useRef(false);
@@ -182,30 +183,32 @@ export default function App() {
     setLuckyBallsActive(false);
   }, []);
 
-  // Detect grab gesture over the close button
+  // Detect grab gesture over the close button and hover state
   useEffect(() => {
-    if (
-      !luckyPhoto ||
-      !isGrabbingRef.current ||
-      !handPosition.detected ||
-      !closeButtonRef.current
-    )
+    if (!luckyPhoto || !handPosition.detected || !closeButtonRef.current) {
+      setIsXButtonHovered(false);
       return;
+    }
 
     const btn = closeButtonRef.current.getBoundingClientRect();
-    // Convert finger pos (0-1 normalized, mirrored X) to screen pixels
     const fingerX = (1 - handPosition.x) * window.innerWidth;
     const fingerY = handPosition.y * window.innerHeight;
-
-    // Add generous hit area padding around the button
     const padding = 30;
+
+    // Check if hand is hovering over the X button
     if (
       fingerX >= btn.left - padding &&
       fingerX <= btn.right + padding &&
       fingerY >= btn.top - padding &&
       fingerY <= btn.bottom + padding
     ) {
-      handleCloseLuckyPhoto();
+      setIsXButtonHovered(true);
+      // Trigger close on grab
+      if (isGrabbingRef.current) {
+        handleCloseLuckyPhoto();
+      }
+    } else {
+      setIsXButtonHovered(false);
     }
   }, [luckyPhoto, isGrabbingRef.current, handPosition, handleCloseLuckyPhoto]);
 
@@ -304,11 +307,19 @@ export default function App() {
             <div
               ref={closeButtonRef}
               onClick={handleCloseLuckyPhoto}
-              className="absolute top-2 right-2 flex items-center justify-center w-10 h-10 rounded-full border-2 border-[#D4AF37] bg-black/60 backdrop-blur-sm cursor-pointer pointer-events-auto transition-all duration-200 hover:bg-[#D4AF37] hover:text-black group"
+              className={`absolute top-2 right-2 flex items-center justify-center w-10 h-10 rounded-full border-2 border-[#D4AF37] backdrop-blur-sm cursor-pointer pointer-events-auto transition-all duration-200 group ${
+                isXButtonHovered
+                  ? "bg-[#D4AF37] scale-110 shadow-[0_0_20px_rgba(212,175,55,0.6)]"
+                  : "bg-black/60 hover:bg-[#D4AF37]"
+              }`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 text-[#D4AF37] group-hover:text-black transition-colors"
+                className={`w-5 h-5 transition-colors ${
+                  isXButtonHovered
+                    ? "text-black"
+                    : "text-[#D4AF37] group-hover:text-black"
+                }`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
