@@ -19,9 +19,9 @@ interface ExperienceProps {
   uploadedPhotos: string[];
   onClosestPhotoChange?: (photoUrl: string | null) => void; // Currently Not Used
   luckyBallsActive: boolean;
-  luckyPhoto: { name: string; imageUrl: string };
+  luckyPhoto: { name: string; imageUrl: string; department: string };
   onLuckyPhotoSelected: (
-    photo: { name: string; imageUrl: string } | null,
+    photo: { name: string; imageUrl: string; department: string } | null,
   ) => void;
   handPosition: { x: number; y: number; detected: boolean };
   isGrabbing: boolean;

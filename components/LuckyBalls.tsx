@@ -92,13 +92,15 @@ interface BallState {
 
 interface LuckyBalls3DProps {
   active: boolean;
-  onPhotoSelected: (photo: { name: string; imageUrl: string } | null) => void;
+  onPhotoSelected: (
+    photo: { name: string; imageUrl: string; department: string } | null,
+  ) => void;
   palmRayOrigin: React.RefObject<THREE.Vector3>;
   palmRayDir: React.RefObject<THREE.Vector3>;
   handPositionDetected: boolean;
   isGrabbing: boolean;
   orbitOffsetRef: number;
-  luckyPhoto: { name: string; imageUrl: string };
+  luckyPhoto: { name: string; imageUrl: string; department: string };
 }
 
 export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
@@ -111,7 +113,9 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   orbitOffsetRef,
   luckyPhoto,
 }) => {
-  const photos = useRef<{ name: string; imageUrl: string }[]>([]);
+  const photos = useRef<
+    { name: string; imageUrl: string; department: string }[]
+  >([]);
   const ballStates = useRef<BallState[]>([]);
   const readyToNextBatchRef = useRef(false);
   const groupRef = useRef<THREE.Group>(null);

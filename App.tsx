@@ -71,6 +71,7 @@ export default function App() {
   const [luckyPhoto, setLuckyPhoto] = useState<{
     name: string;
     imageUrl: string;
+    department: string;
   } | null>(null);
   const [pickedNames, setPickedNames] = useState<string[]>([]);
   const [isXButtonHovered, setIsXButtonHovered] = useState(false);
@@ -175,7 +176,7 @@ export default function App() {
   }, []);
 
   const handleLuckyPhotoSelected = (
-    photo: { name: string; imageUrl: string } | null,
+    photo: { name: string; imageUrl: string; department: string } | null,
   ) => {
     setLuckyPhoto(photo);
     if (photo) {
@@ -310,16 +311,24 @@ export default function App() {
           <div className="relative z-50 transform transition-all duration-500 ease-out animate-scale-in">
             <div
               className="bg-white p-4 pb-8 shadow-2xl"
-              style={{ width: "60vmin", maxWidth: "600px" }}
+              style={{
+                minWidth: "60vmin",
+                maxWidth: "80vmin",
+                minHeight: "275px",
+                maxHeight: "80vh",
+              }}
             >
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-6 bg-gradient-to-b from-[#D4AF37] to-[#C5A028] rounded-sm shadow-lg"></div>
               <img
                 src={luckyPhoto.imageUrl}
                 alt={luckyPhoto.name}
-                className="w-full aspect-square object-cover"
+                className="w-[280px] aspect-square object-cover mx-auto block mt-5 rounded-2xl"
               />
-              <div className="text-center mt-4 font-serif text-gray-700 text-lg">
+              <div className="text-center mt-6 font-serif text-gray-700 text-[40px] mx-auto px-6 max-w-[75vmin] break-words line-clamp-2">
                 {luckyPhoto.name}
+              </div>
+              <div className="text-center mt-2 font-serif text-gray-700 text-[25px] italic px-6 mx-auto max-w-[75vmin] break-words line-clamp-2">
+                {luckyPhoto.department}
               </div>
             </div>
             <div
