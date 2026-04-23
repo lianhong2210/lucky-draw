@@ -101,6 +101,7 @@ interface LuckyBalls3DProps {
   isGrabbing: boolean;
   orbitOffsetRef: number;
   luckyPhoto: { name: string; imageUrl: string; department: string };
+  pickedResetCount: number;
 }
 
 export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
@@ -112,6 +113,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   isGrabbing,
   orbitOffsetRef,
   luckyPhoto,
+  pickedResetCount,
 }) => {
   const photos = useRef<
     { name: string; imageUrl: string; department: string }[]
@@ -241,6 +243,12 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
       }, 5000);
     }
   }, [active]);
+
+  // Reset photos back to full PhotoListing when triggered
+  useEffect(() => {
+    if (pickedResetCount === 0) return; // skip initial mount
+    photos.current = [...PhotoListing];
+  }, [pickedResetCount]);
 
   // const cleanup = useCallback(() => {
   //   phaseRef.current = "IDLE";

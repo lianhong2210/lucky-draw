@@ -2,9 +2,13 @@ import React, { useState } from "react";
 
 interface UIOverlayProps {
   pickedNames: string[];
+  resetPickedRecord: () => void;
 }
 
-export const UIOverlay: React.FC<UIOverlayProps> = ({ pickedNames }) => {
+export const UIOverlay: React.FC<UIOverlayProps> = ({
+  pickedNames,
+  resetPickedRecord,
+}) => {
   const [isPickedListExpanded, setIsPickedListExpanded] = useState(false);
 
   // Helper function to convert base64 to Blob
@@ -37,7 +41,7 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ pickedNames }) => {
             )}
             <button
               onClick={() => setIsPickedListExpanded(!isPickedListExpanded)}
-              className="w-6 h-6 flex items-center justify-center bg-[#F5E6BF] border border-[#D4AF37] rounded-md text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#F5E6BF] transition-colors leading-none"
+              className="w-6 h-6 flex items-center justify-center border border-[#D4AF37] rounded-md text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#F5E6BF] transition-colors leading-none"
               aria-label={
                 isPickedListExpanded
                   ? "Collapse picked list"
@@ -49,21 +53,30 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ pickedNames }) => {
           </div>
 
           {isPickedListExpanded && (
-            <div className="flex flex-col gap-2 max-h-[70vh] overflow-y-auto">
-              {pickedNames.map((name, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-black/60 backdrop-blur-sm border border-[#D4AF37]/40 rounded-sm animate-fade-in"
-                >
-                  <span className="text-[#D4AF37] font-serif text-sm font-bold min-w-[20px]">
-                    {i + 1}.
-                  </span>
-                  <span className="text-[#F5E6BF] font-serif text-sm tracking-wide">
-                    {name}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <>
+              <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto">
+                {pickedNames.map((name, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-black/60 backdrop-blur-sm border border-[#D4AF37]/40 rounded-sm animate-fade-in"
+                  >
+                    <span className="text-[#D4AF37] font-serif text-sm font-bold min-w-[20px]">
+                      {i + 1}.
+                    </span>
+                    <span className="text-[#F5E6BF] font-serif text-sm tracking-wide">
+                      {name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                className="w-full mt-5 px-3 py-1.5 flex items-center justify-center  border border-[#D4AF37] rounded-md text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#F5E6BF] transition-colors leading-none"
+                onClick={resetPickedRecord}
+              >
+                Reset
+              </button>
+            </>
           )}
         </div>
       )}

@@ -26,6 +26,7 @@ interface ExperienceProps {
   handPosition: { x: number; y: number; detected: boolean };
   isGrabbing: boolean;
   orbitOffsetRef: number;
+  pickedResetCount: number;
 }
 
 export const Experience: React.FC<ExperienceProps> = ({
@@ -37,6 +38,7 @@ export const Experience: React.FC<ExperienceProps> = ({
   handPosition,
   isGrabbing,
   orbitOffsetRef,
+  pickedResetCount,
 }) => {
   const controlsRef = useRef<any>(null);
   const raycaster = useRef(new THREE.Raycaster());
@@ -97,6 +99,7 @@ export const Experience: React.FC<ExperienceProps> = ({
           isGrabbing={isGrabbing}
           orbitOffsetRef={orbitOffsetRef}
           luckyPhoto={luckyPhoto}
+          pickedResetCount={pickedResetCount}
         />
 
         {/* Floor Reflections */}

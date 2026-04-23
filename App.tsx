@@ -11,7 +11,11 @@ import { Experience } from "./components/Experience";
 import { UIOverlay } from "./components/UIOverlay";
 import { GestureController } from "./components/GestureController";
 import { TreeMode } from "./types";
-import { getItem, setItem } from "./src/utility/localStorageControl";
+import {
+  getItem,
+  removeItem,
+  setItem,
+} from "./src/utility/localStorageControl";
 import localStorageConfig from "./src/configs/localStorage";
 
 // Simple Error Boundary to catch 3D resource loading errors (like textures)
@@ -75,6 +79,7 @@ export default function App() {
   } | null>(null);
   const [pickedNames, setPickedNames] = useState<string[]>([]);
   const [isXButtonHovered, setIsXButtonHovered] = useState(false);
+  const [pickedResetCount, setPickedResetCount] = useState(0);
 
   // Ref for hand gesture
   const isGrabbingRef = useRef(false);
@@ -190,6 +195,12 @@ export default function App() {
     }
   };
 
+  const resetPickedRecord = () => {
+    removeItem(localStorageConfig.pickedNames);
+    setPickedNames([]);
+    setPickedResetCount((prev) => prev + 1);
+  };
+
   // Ref for the close button to detect grab-over-button
   const closeButtonRef = useRef<HTMLDivElement>(null);
 
@@ -255,6 +266,7 @@ export default function App() {
               handPosition={handPosition}
               isGrabbing={isGrabbingRef.current}
               orbitOffsetRef={orbitOffsetRef.current}
+              pickedResetCount={pickedResetCount}
             />
           </Suspense>
         </Canvas>
@@ -267,7 +279,10 @@ export default function App() {
         dataStyles={{ color: "#D4AF37", fontFamily: "Cinzel" }}
       />
 
-      <UIOverlay pickedNames={pickedNames} />
+      <UIOverlay
+        pickedNames={pickedNames}
+        resetPickedRecord={resetPickedRecord}
+      />
 
       {/* Gesture Control Module */}
       <GestureController
