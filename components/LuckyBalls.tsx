@@ -1,7 +1,9 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import PhotoListing from "../src/listing/sample.json";
+import { getItem } from "../src/utility/localStorageControl";
+import localStorageConfig from "../src/configs/localStorage";
 
 /**
  * OrbitBalls (LuckyBalls3D) - 20 metallic 3D spheres orbiting the tree
@@ -109,7 +111,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   orbitOffsetRef,
   luckyPhoto,
 }) => {
-  const photos = useRef<{ name: string; imageUrl: string }[]>(PhotoListing);
+  const photos = useRef<{ name: string; imageUrl: string }[]>([]);
   const ballStates = useRef<BallState[]>([]);
   const readyToNextBatchRef = useRef(false);
   const groupRef = useRef<THREE.Group>(null);
@@ -123,6 +125,18 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   const grabCooldownRef = useRef(0);
   const ballLertRef = useRef(0.5);
   const isBallReadyRef = useRef(false);
+
+  // Filter photos based on picked names from localStorage
+  useEffect(() => {
+    const pickedNames: string[] = getItem(localStorageConfig.pickedNames) || [];
+
+    // Filter out photos that have already been picked
+    const availablePhotos = PhotoListing.filter(
+      (photo) => !pickedNames.includes(photo.name),
+    );
+
+    photos.current = availablePhotos;
+  }, []);
 
   const getBallCountWithBatch = () => {
     return photos.current.length >= BALL_COUNT

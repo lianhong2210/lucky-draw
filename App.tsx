@@ -11,6 +11,8 @@ import { Experience } from "./components/Experience";
 import { UIOverlay } from "./components/UIOverlay";
 import { GestureController } from "./components/GestureController";
 import { TreeMode } from "./types";
+import { getItem, setItem } from "./src/utility/localStorageControl";
+import localStorageConfig from "./src/configs/localStorage";
 
 // Simple Error Boundary to catch 3D resource loading errors (like textures)
 class ErrorBoundary extends React.Component<
@@ -84,6 +86,7 @@ export default function App() {
     number | null
   >;
   const luckyBallsUsedRef = useRef(false);
+  const hasInitialized = useRef(false);
 
   // Check for share parameter in URL on mount
   useEffect(() => {
@@ -165,11 +168,29 @@ export default function App() {
     };
   }, [mode]);
 
+  useEffect(() => {
+    // Ensure this only runs once
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
+    const prevPickedNames = getItem(localStorageConfig.pickedNames);
+
+    if (prevPickedNames.length > 0) {
+      setPickedNames(prevPickedNames);
+    }
+  }, []);
+
   const handleLuckyPhotoSelected = (
     photo: { name: string; imageUrl: string } | null,
   ) => {
     setLuckyPhoto(photo);
     if (photo) {
+      // Store picked names into local storage
+      setItem(
+        localStorageConfig.pickedNames,
+        JSON.stringify([...pickedNames, photo.name]),
+      );
+
       setPickedNames((prev) => [...prev, photo.name]);
     }
   };
@@ -191,8 +212,11 @@ export default function App() {
     }
 
     const btn = closeButtonRef.current.getBoundingClientRect();
+    // Convert finger pos (0-1 normalized, mirrored X) to screen pixels
     const fingerX = (1 - handPosition.x) * window.innerWidth;
     const fingerY = handPosition.y * window.innerHeight;
+
+    // Add generous hit area padding around the button
     const padding = 30;
 
     // Check if hand is hovering over the X button
