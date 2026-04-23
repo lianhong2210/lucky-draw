@@ -173,7 +173,8 @@ export default function App() {
     if (hasInitialized.current) return;
     hasInitialized.current = true;
 
-    const prevPickedNames = getItem(localStorageConfig.pickedNames);
+    const prevPickedNames: string[] =
+      getItem(localStorageConfig.pickedNames) || [];
 
     if (prevPickedNames.length > 0) {
       setPickedNames(prevPickedNames);
