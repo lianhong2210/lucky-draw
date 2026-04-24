@@ -352,7 +352,13 @@ export const GestureController: React.FC<GestureControllerProps> = ({
       if (isGrabbing) {
         // setGestureStatus("Detected: GRAB");
         openFrames.current = 0;
-        closedFrames.current = 0;
+        closedFrames.current++;
+        if (closedFrames.current > CONFIDENCE_THRESHOLD) {
+          closedFrames.current = 0;
+          if (lastModeRef.current !== TreeMode.FORMED) {
+            onModeChange(TreeMode.FORMED);
+          }
+        }
       } else if (extendedFingers >= 4) {
         // OPEN HAND -> UNLEASH (CHAOS)
         openFrames.current++;
@@ -362,7 +368,6 @@ export const GestureController: React.FC<GestureControllerProps> = ({
 
         if (openFrames.current > CONFIDENCE_THRESHOLD) {
           if (lastModeRef.current !== TreeMode.CHAOS) {
-            lastModeRef.current = TreeMode.CHAOS;
             onModeChange(TreeMode.CHAOS);
           }
         }
@@ -375,7 +380,6 @@ export const GestureController: React.FC<GestureControllerProps> = ({
 
         if (closedFrames.current > CONFIDENCE_THRESHOLD) {
           if (lastModeRef.current !== TreeMode.FORMED) {
-            lastModeRef.current = TreeMode.FORMED;
             onModeChange(TreeMode.FORMED);
           }
         }
