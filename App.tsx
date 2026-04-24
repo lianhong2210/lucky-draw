@@ -96,41 +96,6 @@ export default function App() {
 
   // Check for share parameter in URL on mount
   useEffect(() => {
-    const loadSharedPhotos = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const shareId = urlParams.get("share");
-
-      if (!shareId) return;
-
-      try {
-        // Try API first (works in vercel dev and production)
-        try {
-          const response = await fetch(`/api/share?id=${shareId}`);
-          const data = await response.json();
-
-          if (response.ok && data.success) {
-            setUploadedPhotos(data.images);
-            return;
-          }
-        } catch (apiError) {
-          console.log("API not available, trying localStorage fallback");
-        }
-
-        // Fallback to localStorage if API fails (pure vite dev mode)
-        const shareDataStr = localStorage.getItem(`share_${shareId}`);
-        if (shareDataStr) {
-          const shareData = JSON.parse(shareDataStr);
-          setUploadedPhotos(shareData.images);
-        } else {
-          console.error("Share not found");
-        }
-      } catch (error) {
-        console.error("Error loading shared photos:", error);
-      }
-    };
-
-    loadSharedPhotos();
-
     setTimeout(() => {
       isChaosReadyRef.current = true;
     }, 5000);
