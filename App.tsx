@@ -326,7 +326,7 @@ export default function App() {
                 {luckyPhoto.name}
               </div>
               <div className="text-center mt-2 font-serif text-gray-700 text-[25px] italic px-6 mx-auto max-w-[75vmin] break-words line-clamp-2">
-                {luckyPhoto.department}
+                {"(" + luckyPhoto.department + ")"}
               </div>
             </div>
             <div
