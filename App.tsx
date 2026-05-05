@@ -320,7 +320,7 @@ export default function App() {
               <img
                 src={luckyPhoto.imageUrl}
                 alt={luckyPhoto.name}
-                className="w-[370px] aspect-square object-contain mx-auto block mt-5 rounded-2xl"
+                className="w-[370px] aspect-square object-contain mx-auto block mt-5"
               />
               <div className="text-center mt-6 font-serif text-gray-700 text-[40px] mx-auto px-6 max-w-[75vmin] break-words line-clamp-2">
                 {luckyPhoto.name}
