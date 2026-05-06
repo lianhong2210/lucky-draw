@@ -31,6 +31,28 @@ const ORBIT_RINGS = [
 ];
 const BALL_COUNT = ORBIT_RINGS.reduce((acc, cur) => (acc += cur.count), 0);
 
+// Cryptographically-stronger random float in [0, 1). Falls back to Math.random().
+const secureRandom = (): number => {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.getRandomValues === "function"
+  ) {
+    const arr = new Uint32Array(1);
+    crypto.getRandomValues(arr);
+    return arr[0] / 0x100000000;
+  }
+  return Math.random();
+};
+
+// Fisher-Yates shuffle (in place). Guarantees uniform permutation.
+const shuffleArray = <T,>(arr: T[]): T[] => {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(secureRandom() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+};
+
 const BALL_COLORS = [
   "#FF4444",
   "#44AAFF",
@@ -136,12 +158,13 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   useEffect(() => {
     const pickedNames: string[] = getItem(localStorageConfig.pickedNames) || [];
 
-    // Filter out photos that have already been picked
+    // Filter out photos that have already been picked, then shuffle so
+    // the pool order is randomized (defense-in-depth on top of random pick).
     const availablePhotos = PhotoListing.filter(
       (photo) => !pickedNames.includes(photo.name),
     );
 
-    photos.current = availablePhotos;
+    photos.current = shuffleArray([...availablePhotos]);
   }, []);
 
   const getBallCountWithBatch = () => {
@@ -247,7 +270,7 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
   // Reset photos back to full PhotoListing when triggered
   useEffect(() => {
     if (pickedResetCount === 0) return; // skip initial mount
-    photos.current = [...PhotoListing];
+    photos.current = shuffleArray([...PhotoListing]);
     assignBallPosition();
   }, [pickedResetCount]);
 
@@ -439,8 +462,11 @@ export const LuckyBalls3D: React.FC<LuckyBalls3DProps> = ({
           ballStates.current[i].phase = "GONE";
           mesh.visible = false;
 
-          // Fire random photo callback
-          const randomIndex = Math.floor(Math.random() * photos.current.length);
+          // Fire random photo callback — pool is already shuffled; we also
+          // pick a uniformly random index with a stronger RNG for good measure.
+          const poolLen = photos.current.length;
+          const randomIndex =
+            poolLen > 0 ? Math.floor(secureRandom() * poolLen) : 0;
           const imageUrl = photos.current.splice(randomIndex, 1);
 
           if (imageUrl[0]) {
