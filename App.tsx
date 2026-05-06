@@ -17,6 +17,17 @@ import {
   setItem,
 } from "./src/utility/localStorageControl";
 import localStorageConfig from "./src/configs/localStorage";
+import PhotoListing from "./src/listing/employee.json";
+
+// Preload all employee images on mount so they render instantly when picked
+const useImagePreloader = (imageUrls: string[]) => {
+  useEffect(() => {
+    imageUrls.forEach((url) => {
+      const img = new Image();
+      img.src = url;
+    });
+  }, [imageUrls]);
+};
 
 // Simple Error Boundary to catch 3D resource loading errors (like textures)
 class ErrorBoundary extends React.Component<
@@ -63,6 +74,9 @@ class ErrorBoundary extends React.Component<
 }
 
 export default function App() {
+  // Preload all employee photos so they are cached before being picked
+  useImagePreloader(PhotoListing.map((p) => p.imageUrl));
+
   // States
   const [mode, setMode] = useState<TreeMode>(TreeMode.FORMED);
   const [handPosition, setHandPosition] = useState<{
