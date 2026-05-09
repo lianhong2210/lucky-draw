@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import PhotoListing from "../src/listing/employee.json";
+import PhotoListing from "../src/listing/employee-new.json";
 import { getItem } from "../src/utility/localStorageControl";
 import localStorageConfig from "../src/configs/localStorage";
 
