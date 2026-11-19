@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Credits } from "./Credits";
+import { Tooltip } from "./Tooltip";
 
 interface UIOverlayProps {
   pickedNames: string[];
@@ -40,28 +41,33 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({
                 Picked
               </h2>
             )}
-            <button
-              onClick={() => setIsPickedListExpanded(!isPickedListExpanded)}
-              className="w-6 h-6 flex items-center justify-center border border-[#D4AF37] rounded-md text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition-colors"
-              aria-label={
-                isPickedListExpanded
-                  ? "Collapse picked list"
-                  : "Expand picked list"
-              }
+            <Tooltip
+              label={isPickedListExpanded ? "Collapse" : "Expand"}
+              side="right"
             >
-              <svg
-                viewBox="0 0 16 16"
-                className="w-3.5 h-3.5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                aria-hidden="true"
+              <button
+                onClick={() => setIsPickedListExpanded(!isPickedListExpanded)}
+                className="w-6 h-6 flex items-center justify-center border border-[#D4AF37] rounded-md text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition-colors"
+                aria-label={
+                  isPickedListExpanded
+                    ? "Collapse picked list"
+                    : "Expand picked list"
+                }
               >
-                <path d="M3 8h10" />
-                {!isPickedListExpanded && <path d="M8 3v10" />}
-              </svg>
-            </button>
+                <svg
+                  viewBox="0 0 16 16"
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3 8h10" />
+                  {!isPickedListExpanded && <path d="M8 3v10" />}
+                </svg>
+              </button>
+            </Tooltip>
           </div>
 
           {isPickedListExpanded && (

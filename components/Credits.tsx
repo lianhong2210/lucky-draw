@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { Tooltip } from "./Tooltip";
 
 interface Developer {
   name: string;
@@ -59,30 +60,35 @@ export const Credits: React.FC = () => {
 
   return (
     <>
-      <button
-        ref={triggerRef}
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-30 w-11 h-11 flex items-center justify-center rounded-full border-2 border-[#D4AF37] bg-black/60 backdrop-blur-sm text-[#D4AF37] shadow-[0_0_16px_rgba(212,175,55,0.25)] hover:bg-[#D4AF37] hover:text-black transition-colors pointer-events-auto"
-        aria-label="Credits"
-        title="Credits"
+      <Tooltip
+        label="Credits"
+        side="left"
+        className="fixed bottom-6 right-6 z-30 pointer-events-auto"
       >
-        {/* Users icon */}
-        <svg
-          viewBox="0 0 24 24"
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
+        <button
+          ref={triggerRef}
+          onClick={() => setOpen(true)}
+          className="w-11 h-11 flex items-center justify-center rounded-full border-2 border-[#D4AF37] bg-black/60 backdrop-blur-sm text-[#D4AF37] shadow-[0_0_16px_rgba(212,175,55,0.25)] hover:bg-[#D4AF37] hover:text-black transition-colors"
+          aria-label="Credits"
         >
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </svg>
-      </button>
+          {/* Users icon */}
+          <svg
+            viewBox="0 0 24 24"
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </button>
+      </Tooltip>
 
       {/* Portal to <body> so the modal sits above the webcam preview (z-50)
           but below the hand-pointer cursor (z-60). */}
