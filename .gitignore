@@ -23,6 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 *.jpg
+!public/og-image.jpg
 
 .vercel
 
