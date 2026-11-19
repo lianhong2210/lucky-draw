@@ -4,8 +4,8 @@
 #
 # Scans a folder of sample image files and generates a JSON file.
 #
-# Expected filename format: "First Last (Department).ext"
-# Example: "Lian Hong (Tazte IT).jpeg"
+# The file name (without extension) is used as the display name.
+# Example: "John Tan.jpeg" -> { "name": "John Tan", ... }
 #
 # Pre-requisites: 
 #   Redirect to scripts folder before running the script
@@ -72,17 +72,8 @@ find "$IMAGE_FOLDER" -maxdepth 1 -type f | sort | while IFS= read -r filepath; d
     *) continue ;;
   esac
 
-  # Extract name: everything before " ("
-  name="${filename% (*}"
-
-  # Extract department: content inside parentheses
-  department=$(echo "$filename" | sed 's/.*(\(.*\)).*/\1/')
-
-  # Skip if department not found or same as filename (no match)
-  if [ -z "$department" ] || [ "$department" = "$filename" ]; then
-    echo "  Skipped (no department found): $filename"
-    continue
-  fi
+  # Extract name: filename without extension
+  name="${filename%.*}"
 
   # Skip if name is empty
   if [ -z "$name" ]; then
@@ -95,12 +86,11 @@ find "$IMAGE_FOLDER" -maxdepth 1 -type f | sort | while IFS= read -r filepath; d
   # Escape values for JSON
   name_escaped=$(json_escape "$name")
   path_escaped=$(json_escape "$image_url")
-  dept_escaped=$(json_escape "$department")
 
   # Write entry to temp file
-  echo "{\"name\": \"${name_escaped}\", \"imageUrl\": \"${path_escaped}\", \"department\": \"${dept_escaped}\"}" >> "$TMP_FILE"
+  echo "{\"name\": \"${name_escaped}\", \"imageUrl\": \"${path_escaped}\"}" >> "$TMP_FILE"
 
-  echo "  OK  $name | $department"
+  echo "  OK  $name"
 done
 
 # ── Write final JSON ──────────────────────────────────────────────────────────

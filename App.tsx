@@ -89,7 +89,6 @@ export default function App() {
   const [luckyPhoto, setLuckyPhoto] = useState<{
     name: string;
     imageUrl: string;
-    department: string;
   } | null>(null);
   const [pickedNames, setPickedNames] = useState<string[]>([]);
   const [pickedResetCount, setPickedResetCount] = useState(0);
@@ -168,7 +167,7 @@ export default function App() {
   }, [luckyPhoto]);
 
   const handleLuckyPhotoSelected = (
-    photo: { name: string; imageUrl: string; department: string } | null,
+    photo: { name: string; imageUrl: string } | null,
   ) => {
     setLuckyPhoto(photo);
     if (photo) {
@@ -338,9 +337,6 @@ export default function App() {
               />
               <div className="text-center mt-6 font-serif text-gray-700 text-[40px] mx-auto px-6 max-w-[75vmin] break-words line-clamp-2">
                 {luckyPhoto.name}
-              </div>
-              <div className="text-center mt-2 font-serif text-gray-700 text-[25px] italic px-6 mx-auto max-w-[75vmin] break-words line-clamp-2">
-                {"(" + luckyPhoto.department + ")"}
               </div>
             </div>
             <div

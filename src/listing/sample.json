@@ -1,506 +1,398 @@
 [
   {
     "name": "sample 1",
-    "imageUrl": "/photos/balls/sample/1.png",
-    "department": "IT Department"
+    "imageUrl": "/photos/balls/sample/1.png"
   },
   {
     "name": "sample 2",
-    "imageUrl": "/photos/balls/sample/2.png",
-    "department": "IT Department"
+    "imageUrl": "/photos/balls/sample/2.png"
   },
   {
     "name": "sample 3",
-    "imageUrl": "/photos/balls/sample/3.png",
-    "department": "IT Department"
+    "imageUrl": "/photos/balls/sample/3.png"
   },
   {
     "name": "sample 4",
-    "imageUrl": "/photos/balls/sample/4.png",
-    "department": "IT Department"
+    "imageUrl": "/photos/balls/sample/4.png"
   },
   {
     "name": "sample 5",
-    "imageUrl": "/photos/balls/sample/5.png",
-    "department": "IT Department"
+    "imageUrl": "/photos/balls/sample/5.png"
   },
   {
     "name": "sample 6",
-    "imageUrl": "/photos/balls/sample/6.png",
-    "department": "IT Department"
+    "imageUrl": "/photos/balls/sample/6.png"
   },
   {
     "name": "sample 7",
-    "imageUrl": "/photos/balls/sample/7.png",
-    "department": "IT Department"
+    "imageUrl": "/photos/balls/sample/7.png"
   },
   {
     "name": "sample 8",
-    "imageUrl": "/photos/balls/sample/8.png",
-    "department": "IT Department"
+    "imageUrl": "/photos/balls/sample/8.png"
   },
   {
     "name": "sample 9",
-    "imageUrl": "/photos/balls/sample/9.png",
-    "department": "IT Department"
+    "imageUrl": "/photos/balls/sample/9.png"
   },
   {
     "name": "sample 10",
-    "imageUrl": "/photos/balls/sample/10.png",
-    "department": "IT Department"
+    "imageUrl": "/photos/balls/sample/10.png"
   },
-
   {
     "name": "sample 11",
-    "imageUrl": "/photos/balls/sample/1.png",
-    "department": "HR Department"
+    "imageUrl": "/photos/balls/sample/1.png"
   },
   {
     "name": "sample 12",
-    "imageUrl": "/photos/balls/sample/2.png",
-    "department": "HR Department"
+    "imageUrl": "/photos/balls/sample/2.png"
   },
   {
     "name": "sample 13",
-    "imageUrl": "/photos/balls/sample/3.png",
-    "department": "HR Department"
+    "imageUrl": "/photos/balls/sample/3.png"
   },
   {
     "name": "sample 14",
-    "imageUrl": "/photos/balls/sample/4.png",
-    "department": "HR Department"
+    "imageUrl": "/photos/balls/sample/4.png"
   },
   {
     "name": "sample 15",
-    "imageUrl": "/photos/balls/sample/5.png",
-    "department": "HR Department"
+    "imageUrl": "/photos/balls/sample/5.png"
   },
   {
     "name": "sample 16",
-    "imageUrl": "/photos/balls/sample/6.png",
-    "department": "HR Department"
+    "imageUrl": "/photos/balls/sample/6.png"
   },
   {
     "name": "sample 17",
-    "imageUrl": "/photos/balls/sample/7.png",
-    "department": "HR Department"
+    "imageUrl": "/photos/balls/sample/7.png"
   },
   {
     "name": "sample 18",
-    "imageUrl": "/photos/balls/sample/8.png",
-    "department": "HR Department"
+    "imageUrl": "/photos/balls/sample/8.png"
   },
   {
     "name": "sample 19",
-    "imageUrl": "/photos/balls/sample/9.png",
-    "department": "HR Department"
+    "imageUrl": "/photos/balls/sample/9.png"
   },
   {
     "name": "sample 20",
-    "imageUrl": "/photos/balls/sample/10.png",
-    "department": "HR Department"
+    "imageUrl": "/photos/balls/sample/10.png"
   },
-
   {
     "name": "sample 21",
-    "imageUrl": "/photos/balls/sample/1.png",
-    "department": "Sales Department"
+    "imageUrl": "/photos/balls/sample/1.png"
   },
   {
     "name": "sample 22",
-    "imageUrl": "/photos/balls/sample/2.png",
-    "department": "Sales Department"
+    "imageUrl": "/photos/balls/sample/2.png"
   },
   {
     "name": "sample 23",
-    "imageUrl": "/photos/balls/sample/3.png",
-    "department": "Sales Department"
+    "imageUrl": "/photos/balls/sample/3.png"
   },
   {
     "name": "sample 24",
-    "imageUrl": "/photos/balls/sample/4.png",
-    "department": "Sales Department"
+    "imageUrl": "/photos/balls/sample/4.png"
   },
   {
     "name": "sample 25",
-    "imageUrl": "/photos/balls/sample/5.png",
-    "department": "Sales Department"
+    "imageUrl": "/photos/balls/sample/5.png"
   },
   {
     "name": "sample 26",
-    "imageUrl": "/photos/balls/sample/6.png",
-    "department": "Sales Department"
+    "imageUrl": "/photos/balls/sample/6.png"
   },
   {
     "name": "sample 27",
-    "imageUrl": "/photos/balls/sample/7.png",
-    "department": "Sales Department"
+    "imageUrl": "/photos/balls/sample/7.png"
   },
   {
     "name": "sample 28",
-    "imageUrl": "/photos/balls/sample/8.png",
-    "department": "Sales Department"
+    "imageUrl": "/photos/balls/sample/8.png"
   },
   {
     "name": "sample 29",
-    "imageUrl": "/photos/balls/sample/9.png",
-    "department": "Sales Department"
+    "imageUrl": "/photos/balls/sample/9.png"
   },
   {
     "name": "sample 30",
-    "imageUrl": "/photos/balls/sample/10.png",
-    "department": "Sales Department"
+    "imageUrl": "/photos/balls/sample/10.png"
   },
-
   {
     "name": "sample 31",
-    "imageUrl": "/photos/balls/sample/1.png",
-    "department": "Admin Department"
+    "imageUrl": "/photos/balls/sample/1.png"
   },
   {
     "name": "sample 32",
-    "imageUrl": "/photos/balls/sample/2.png",
-    "department": "Admin Department"
+    "imageUrl": "/photos/balls/sample/2.png"
   },
   {
     "name": "sample 33",
-    "imageUrl": "/photos/balls/sample/3.png",
-    "department": "Admin Department"
+    "imageUrl": "/photos/balls/sample/3.png"
   },
   {
     "name": "sample 34",
-    "imageUrl": "/photos/balls/sample/4.png",
-    "department": "Admin Department"
+    "imageUrl": "/photos/balls/sample/4.png"
   },
   {
     "name": "sample 35",
-    "imageUrl": "/photos/balls/sample/5.png",
-    "department": "Admin Department"
+    "imageUrl": "/photos/balls/sample/5.png"
   },
   {
     "name": "sample 36",
-    "imageUrl": "/photos/balls/sample/6.png",
-    "department": "Admin Department"
+    "imageUrl": "/photos/balls/sample/6.png"
   },
   {
     "name": "sample 37",
-    "imageUrl": "/photos/balls/sample/7.png",
-    "department": "Admin Department"
+    "imageUrl": "/photos/balls/sample/7.png"
   },
   {
     "name": "sample 38",
-    "imageUrl": "/photos/balls/sample/8.png",
-    "department": "Admin Department"
+    "imageUrl": "/photos/balls/sample/8.png"
   },
   {
     "name": "sample 39",
-    "imageUrl": "/photos/balls/sample/9.png",
-    "department": "Admin Department"
+    "imageUrl": "/photos/balls/sample/9.png"
   },
   {
     "name": "sample 40",
-    "imageUrl": "/photos/balls/sample/10.png",
-    "department": "Admin Department"
+    "imageUrl": "/photos/balls/sample/10.png"
   },
-
   {
     "name": "sample 41",
-    "imageUrl": "/photos/balls/sample/1.png",
-    "department": "Finance Department"
+    "imageUrl": "/photos/balls/sample/1.png"
   },
   {
     "name": "sample 42",
-    "imageUrl": "/photos/balls/sample/2.png",
-    "department": "Finance Department"
+    "imageUrl": "/photos/balls/sample/2.png"
   },
   {
     "name": "sample 43",
-    "imageUrl": "/photos/balls/sample/3.png",
-    "department": "Finance Department"
+    "imageUrl": "/photos/balls/sample/3.png"
   },
   {
     "name": "sample 44",
-    "imageUrl": "/photos/balls/sample/4.png",
-    "department": "Finance Department"
+    "imageUrl": "/photos/balls/sample/4.png"
   },
   {
     "name": "sample 45",
-    "imageUrl": "/photos/balls/sample/5.png",
-    "department": "Finance Department"
+    "imageUrl": "/photos/balls/sample/5.png"
   },
   {
     "name": "sample 46",
-    "imageUrl": "/photos/balls/sample/6.png",
-    "department": "Finance Department"
+    "imageUrl": "/photos/balls/sample/6.png"
   },
   {
     "name": "sample 47",
-    "imageUrl": "/photos/balls/sample/7.png",
-    "department": "Finance Department"
+    "imageUrl": "/photos/balls/sample/7.png"
   },
   {
     "name": "sample 48",
-    "imageUrl": "/photos/balls/sample/8.png",
-    "department": "Finance Department"
+    "imageUrl": "/photos/balls/sample/8.png"
   },
   {
     "name": "sample 49",
-    "imageUrl": "/photos/balls/sample/9.png",
-    "department": "Finance Department"
+    "imageUrl": "/photos/balls/sample/9.png"
   },
   {
     "name": "sample 50",
-    "imageUrl": "/photos/balls/sample/10.png",
-    "department": "Finance Department"
+    "imageUrl": "/photos/balls/sample/10.png"
   },
-
   {
     "name": "sample 51",
-    "imageUrl": "/photos/balls/sample/1.png",
-    "department": "Marketing Department"
+    "imageUrl": "/photos/balls/sample/1.png"
   },
   {
     "name": "sample 52",
-    "imageUrl": "/photos/balls/sample/2.png",
-    "department": "Marketing Department"
+    "imageUrl": "/photos/balls/sample/2.png"
   },
   {
     "name": "sample 53",
-    "imageUrl": "/photos/balls/sample/3.png",
-    "department": "Marketing Department"
+    "imageUrl": "/photos/balls/sample/3.png"
   },
   {
     "name": "sample 54",
-    "imageUrl": "/photos/balls/sample/4.png",
-    "department": "Marketing Department"
+    "imageUrl": "/photos/balls/sample/4.png"
   },
   {
     "name": "sample 55",
-    "imageUrl": "/photos/balls/sample/5.png",
-    "department": "Marketing Department"
+    "imageUrl": "/photos/balls/sample/5.png"
   },
   {
     "name": "sample 56",
-    "imageUrl": "/photos/balls/sample/6.png",
-    "department": "Marketing Department"
+    "imageUrl": "/photos/balls/sample/6.png"
   },
   {
     "name": "sample 57",
-    "imageUrl": "/photos/balls/sample/7.png",
-    "department": "Marketing Department"
+    "imageUrl": "/photos/balls/sample/7.png"
   },
   {
     "name": "sample 58",
-    "imageUrl": "/photos/balls/sample/8.png",
-    "department": "Marketing Department"
+    "imageUrl": "/photos/balls/sample/8.png"
   },
   {
     "name": "sample 59",
-    "imageUrl": "/photos/balls/sample/9.png",
-    "department": "Marketing Department"
+    "imageUrl": "/photos/balls/sample/9.png"
   },
   {
     "name": "sample 60",
-    "imageUrl": "/photos/balls/sample/10.png",
-    "department": "Marketing Department"
+    "imageUrl": "/photos/balls/sample/10.png"
   },
-
   {
     "name": "sample 61",
-    "imageUrl": "/photos/balls/sample/1.png",
-    "department": "Legal Department"
+    "imageUrl": "/photos/balls/sample/1.png"
   },
   {
     "name": "sample 62",
-    "imageUrl": "/photos/balls/sample/2.png",
-    "department": "Legal Department"
+    "imageUrl": "/photos/balls/sample/2.png"
   },
   {
     "name": "sample 63",
-    "imageUrl": "/photos/balls/sample/3.png",
-    "department": "Legal Department"
+    "imageUrl": "/photos/balls/sample/3.png"
   },
   {
     "name": "sample 64",
-    "imageUrl": "/photos/balls/sample/4.png",
-    "department": "Legal Department"
+    "imageUrl": "/photos/balls/sample/4.png"
   },
   {
     "name": "sample 65",
-    "imageUrl": "/photos/balls/sample/5.png",
-    "department": "Legal Department"
+    "imageUrl": "/photos/balls/sample/5.png"
   },
   {
     "name": "sample 66",
-    "imageUrl": "/photos/balls/sample/6.png",
-    "department": "Legal Department"
+    "imageUrl": "/photos/balls/sample/6.png"
   },
   {
     "name": "sample 67",
-    "imageUrl": "/photos/balls/sample/7.png",
-    "department": "Legal Department"
+    "imageUrl": "/photos/balls/sample/7.png"
   },
   {
     "name": "sample 68",
-    "imageUrl": "/photos/balls/sample/8.png",
-    "department": "Legal Department"
+    "imageUrl": "/photos/balls/sample/8.png"
   },
   {
     "name": "sample 69",
-    "imageUrl": "/photos/balls/sample/9.png",
-    "department": "Legal Department"
+    "imageUrl": "/photos/balls/sample/9.png"
   },
   {
     "name": "sample 70",
-    "imageUrl": "/photos/balls/sample/10.png",
-    "department": "Legal Department"
+    "imageUrl": "/photos/balls/sample/10.png"
   },
-
   {
     "name": "sample 71",
-    "imageUrl": "/photos/balls/sample/1.png",
-    "department": "Accounting Department"
+    "imageUrl": "/photos/balls/sample/1.png"
   },
   {
     "name": "sample 72",
-    "imageUrl": "/photos/balls/sample/2.png",
-    "department": "Accounting Department"
+    "imageUrl": "/photos/balls/sample/2.png"
   },
   {
     "name": "sample 73",
-    "imageUrl": "/photos/balls/sample/3.png",
-    "department": "Accounting Department"
+    "imageUrl": "/photos/balls/sample/3.png"
   },
   {
     "name": "sample 74",
-    "imageUrl": "/photos/balls/sample/4.png",
-    "department": "Accounting Department"
+    "imageUrl": "/photos/balls/sample/4.png"
   },
   {
     "name": "sample 75",
-    "imageUrl": "/photos/balls/sample/5.png",
-    "department": "Accounting Department"
+    "imageUrl": "/photos/balls/sample/5.png"
   },
   {
     "name": "sample 76",
-    "imageUrl": "/photos/balls/sample/6.png",
-    "department": "Accounting Department"
+    "imageUrl": "/photos/balls/sample/6.png"
   },
   {
     "name": "sample 77",
-    "imageUrl": "/photos/balls/sample/7.png",
-    "department": "Accounting Department"
+    "imageUrl": "/photos/balls/sample/7.png"
   },
   {
     "name": "sample 78",
-    "imageUrl": "/photos/balls/sample/8.png",
-    "department": "Accounting Department"
+    "imageUrl": "/photos/balls/sample/8.png"
   },
   {
     "name": "sample 79",
-    "imageUrl": "/photos/balls/sample/9.png",
-    "department": "Accounting Department"
+    "imageUrl": "/photos/balls/sample/9.png"
   },
   {
     "name": "sample 80",
-    "imageUrl": "/photos/balls/sample/10.png",
-    "department": "Accounting Department"
+    "imageUrl": "/photos/balls/sample/10.png"
   },
-
   {
     "name": "sample 81",
-    "imageUrl": "/photos/balls/sample/1.png",
-    "department": "Others Department"
+    "imageUrl": "/photos/balls/sample/1.png"
   },
   {
     "name": "sample 82",
-    "imageUrl": "/photos/balls/sample/2.png",
-    "department": "Others Department"
+    "imageUrl": "/photos/balls/sample/2.png"
   },
   {
     "name": "sample 83",
-    "imageUrl": "/photos/balls/sample/3.png",
-    "department": "Others Department"
+    "imageUrl": "/photos/balls/sample/3.png"
   },
   {
     "name": "sample 84",
-    "imageUrl": "/photos/balls/sample/4.png",
-    "department": "Others Department"
+    "imageUrl": "/photos/balls/sample/4.png"
   },
   {
     "name": "sample 85",
-    "imageUrl": "/photos/balls/sample/5.png",
-    "department": "Others Department"
+    "imageUrl": "/photos/balls/sample/5.png"
   },
   {
     "name": "sample 86",
-    "imageUrl": "/photos/balls/sample/6.png",
-    "department": "Others Department"
+    "imageUrl": "/photos/balls/sample/6.png"
   },
   {
     "name": "sample 87",
-    "imageUrl": "/photos/balls/sample/7.png",
-    "department": "Others Department"
+    "imageUrl": "/photos/balls/sample/7.png"
   },
   {
     "name": "sample 88",
-    "imageUrl": "/photos/balls/sample/8.png",
-    "department": "Others Department"
+    "imageUrl": "/photos/balls/sample/8.png"
   },
   {
     "name": "sample 89",
-    "imageUrl": "/photos/balls/sample/9.png",
-    "department": "Others Department"
+    "imageUrl": "/photos/balls/sample/9.png"
   },
   {
     "name": "sample 90",
-    "imageUrl": "/photos/balls/sample/10.png",
-    "department": "Others Department"
+    "imageUrl": "/photos/balls/sample/10.png"
   },
-
   {
     "name": "sample 81",
-    "imageUrl": "/photos/balls/sample/1.png",
-    "department": "Creative Team Department"
+    "imageUrl": "/photos/balls/sample/1.png"
   },
   {
     "name": "sample 82",
-    "imageUrl": "/photos/balls/sample/2.png",
-    "department": "Creative Team Department"
+    "imageUrl": "/photos/balls/sample/2.png"
   },
   {
     "name": "sample 83",
-    "imageUrl": "/photos/balls/sample/3.png",
-    "department": "Creative Team Department"
+    "imageUrl": "/photos/balls/sample/3.png"
   },
   {
     "name": "sample 84",
-    "imageUrl": "/photos/balls/sample/4.png",
-    "department": "Creative Team Department"
+    "imageUrl": "/photos/balls/sample/4.png"
   },
   {
     "name": "sample 85",
-    "imageUrl": "/photos/balls/sample/5.png",
-    "department": "Creative Team Department"
+    "imageUrl": "/photos/balls/sample/5.png"
   },
   {
     "name": "sample 86",
-    "imageUrl": "/photos/balls/sample/6.png",
-    "department": "Creative Team Department"
+    "imageUrl": "/photos/balls/sample/6.png"
   },
   {
     "name": "sample 87",
-    "imageUrl": "/photos/balls/sample/7.png",
-    "department": "Creative Team Department"
+    "imageUrl": "/photos/balls/sample/7.png"
   },
   {
     "name": "sample 88",
-    "imageUrl": "/photos/balls/sample/8.png",
-    "department": "Creative Team Department"
+    "imageUrl": "/photos/balls/sample/8.png"
   },
   {
     "name": "sample 89",
-    "imageUrl": "/photos/balls/sample/9.png",
-    "department": "Creative Team Department"
+    "imageUrl": "/photos/balls/sample/9.png"
   }
 ]

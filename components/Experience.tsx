@@ -19,9 +19,9 @@ interface ExperienceProps {
   uploadedPhotos: string[];
   onClosestPhotoChange?: (photoUrl: string | null) => void; // Currently Not Used
   luckyBallsActive: boolean;
-  luckyPhoto: { name: string; imageUrl: string; department: string };
+  luckyPhoto: { name: string; imageUrl: string };
   onLuckyPhotoSelected: (
-    photo: { name: string; imageUrl: string; department: string } | null,
+    photo: { name: string; imageUrl: string } | null,
   ) => void;
   handPosition: { x: number; y: number; detected: boolean };
   isGrabbing: boolean;
@@ -88,7 +88,6 @@ export const Experience: React.FC<ExperienceProps> = ({
 
       <group position={[0, -5, 0]}>
         <Foliage mode={mode} count={6000} />
-        {/* <LogoOrnaments mode={mode} count={400} /> */}
         <Polaroids mode={mode} uploadedPhotos={uploadedPhotos} />
         <LuckyBalls3D
           active={luckyBallsActive}
