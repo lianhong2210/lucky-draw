@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Credits } from "./Credits";
 
 interface UIOverlayProps {
   pickedNames: string[];
@@ -41,14 +42,25 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({
             )}
             <button
               onClick={() => setIsPickedListExpanded(!isPickedListExpanded)}
-              className="w-6 h-6 flex items-center justify-center border border-[#D4AF37] rounded-md text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#F5E6BF] transition-colors leading-none"
+              className="w-6 h-6 flex items-center justify-center border border-[#D4AF37] rounded-md text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition-colors"
               aria-label={
                 isPickedListExpanded
                   ? "Collapse picked list"
                   : "Expand picked list"
               }
             >
-              {isPickedListExpanded ? "-" : "+"}
+              <svg
+                viewBox="0 0 16 16"
+                className="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <path d="M3 8h10" />
+                {!isPickedListExpanded && <path d="M8 3v10" />}
+              </svg>
             </button>
           </div>
 
@@ -71,7 +83,7 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({
               </div>
 
               <button
-                className="w-full mt-5 px-3 py-1.5 flex items-center justify-center  border border-[#D4AF37] rounded-md text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#F5E6BF] transition-colors leading-none"
+                className="w-full mt-5 px-3 py-1.5 flex items-center justify-center  border border-[#D4AF37] rounded-md text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition-colors leading-none"
                 onClick={resetPickedRecord}
               >
                 Reset
@@ -87,6 +99,9 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({
           Lucky Draw Session
         </h1>
       </header>
+
+      {/* Credits - bottom right */}
+      <Credits />
     </div>
   );
 };
