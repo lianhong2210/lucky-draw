@@ -61,7 +61,7 @@ echo ""
 
 TMP_FILE=$(mktemp)
 
-find "$IMAGE_FOLDER" -maxdepth 1 -type f | sort | while IFS= read -r filepath; do
+find "$IMAGE_FOLDER" -maxdepth 1 -type f | sort -V | while IFS= read -r filepath; do
   filename="$(basename "$filepath")"
 
   # Check if file has an image extension (case-insensitive)
