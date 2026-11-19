@@ -1,5 +1,5 @@
 {
-  "name": "Mestiz Interactive Lucky Draw",
+  "name": "3D Interactive Lucky Draw",
   "description": "A high-fidelity, interactive lucky draw experience featuring a dynamic chaos-to-order assembly system, cinema-quality bloom, and a luxurious emerald and gold aesthetic.",
   "requestFramePermissions": ["camera"]
 }

@@ -87,7 +87,7 @@ export const Experience: React.FC<ExperienceProps> = ({
       <pointLight position={[-10, 5, -10]} intensity={1} color="#D4AF37" />
 
       <group position={[0, -5, 0]}>
-        <Foliage mode={mode} count={3500} />
+        <Foliage mode={mode} count={6000} />
         {/* <LogoOrnaments mode={mode} count={400} /> */}
         <Polaroids mode={mode} uploadedPhotos={uploadedPhotos} />
         <LuckyBalls3D

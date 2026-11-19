@@ -2,7 +2,7 @@
 # =============================================================================
 # image-to-json.sh
 #
-# Scans a folder of employee image files and generates a JSON file.
+# Scans a folder of sample image files and generates a JSON file.
 #
 # Expected filename format: "First Last (Department).ext"
 # Example: "Lian Hong (Tazte IT).jpeg"
@@ -13,13 +13,13 @@
 #
 # Usage:
 #   ./image-to-json.sh
-#   ./image-to-json.sh --folder ./photos --output result.json --base-path /photos/balls/employee
+#   ./image-to-json.sh --folder ./photos --output result.json --base-path /photos/balls/sample
 # =============================================================================
 
 # ── Default Configuration ─────────────────────────────────────────────────────
-IMAGE_FOLDER="../../public/photos/balls/employee"
-OUTPUT_FILE="../listing/employee.json"
-BASE_PATH="/photos/balls/employee"
+IMAGE_FOLDER="../../public/photos/balls/sample"
+OUTPUT_FILE="../listing/sample.json"
+BASE_PATH="/photos/balls/sample"
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Parse Arguments ───────────────────────────────────────────────────────────
@@ -31,9 +31,9 @@ while [ $# -gt 0 ]; do
     --help|-h)
       echo "Usage: $0 [--folder <path>] [--output <file>] [--base-path <path>]"
       echo ""
-      echo "  --folder     Folder containing employee images (default: ./images)"
-      echo "  --output     Output JSON filename             (default: employees.json)"
-      echo "  --base-path  Prefix used for imageUrl field  (default: /photos/balls/employee)"
+      echo "  --folder     Folder containing sample images (default: ./images)"
+      echo "  --output     Output JSON filename             (default: sample.json)"
+      echo "  --base-path  Prefix used for imageUrl field  (default: /photos/balls/sample)"
       exit 0
       ;;
     *)

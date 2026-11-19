@@ -25,4 +25,11 @@ dist-ssr
 *.jpg
 
 .vercel
-.env*.local
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# environment
+.env    
+.env.local

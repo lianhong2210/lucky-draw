@@ -1,8 +1,8 @@
-import React, { useMemo, useRef, useEffect } from "react";
+import React, { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { TreeMode } from "../types";
-import { loadSvgCandidates, fillSvgTargetPositions } from "../utils/svgSampler";
+import { fillGiftBoxTargets } from "../utils/giftBoxShape";
 
 interface FoliageProps {
   mode: TreeMode;
@@ -16,7 +16,8 @@ const vertexShader = `
   attribute vec3 aChaosPos;
   attribute vec3 aTargetPos;
   attribute float aRandom;
-  
+  attribute vec3 aColor;
+
   varying vec3 vColor;
   varying float vAlpha;
 
@@ -47,16 +48,9 @@ const vertexShader = `
     gl_PointSize = (4.0 * aRandom + 2.0) * (20.0 / -mvPosition.z);
     gl_Position = projectionMatrix * mvPosition;
 
-    // Color logic: Mix between Chaos Gold and Formed Bright Red
-    vec3 goldColor = vec3(1.0, 0.84, 0.0);
-    vec3 redColor = vec3(0.8, 0.0, 0.0);
-    vec3 brightRed = vec3(1.0, 0.1, 0.1);
-    
-    // Sparkle effect
+    // Color logic: per-particle present colour (red box / gold ribbon & bow)
     float sparkle = sin(uTime * 5.0 + aRandom * 100.0);
-    vec3 finalRed = mix(redColor, brightRed, aRandom * 0.3);
-    
-    vColor = mix(brightRed, finalRed, easedProgress);
+    vColor = aColor * (0.8 + aRandom * 0.35);
     
     // Add sparkle to the tips
     if (sparkle > 0.9) {
@@ -86,15 +80,14 @@ const fragmentShader = `
 
 export const Foliage: React.FC<FoliageProps> = ({ mode, count }) => {
   const meshRef = useRef<THREE.Points>(null);
-  const targetAttrRef = useRef<THREE.BufferAttribute | null>(null);
-  const [isLoaded, setIsLoaded] = React.useState(false);
 
   // Target progress reference for smooth JS-side dampening logic for the uniform
   const progressRef = useRef(0);
 
-  const { chaosPositions, targetPositions, randoms } = useMemo(() => {
+  const { chaosPositions, targetPositions, colors, randoms } = useMemo(() => {
     const chaos = new Float32Array(count * 3);
     const target = new Float32Array(count * 3);
+    const col = new Float32Array(count * 3);
     const rnd = new Float32Array(count);
 
     for (let i = 0; i < count; i++) {
@@ -107,33 +100,20 @@ export const Foliage: React.FC<FoliageProps> = ({ mode, count }) => {
       chaos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) + 5; // Lift up slightly
       chaos[i * 3 + 2] = r * Math.cos(phi);
 
-      // 2. Target Positions: Will be filled by SVG
-      target[i * 3] = 0;
-      target[i * 3 + 1] = 0;
-      target[i * 3 + 2] = 0;
-
-      // 3. Randoms
+      // 2. Randoms
       rnd[i] = Math.random();
     }
+
+    // 3. Target Positions + colours: a 3D present box
+    fillGiftBoxTargets(target, col, count);
 
     return {
       chaosPositions: chaos,
       targetPositions: target,
+      colors: col,
       randoms: rnd,
     };
   }, [count]);
-
-  // Load SVG and update target positions
-  useEffect(() => {
-    loadSvgCandidates().then((candidates) => {
-      if (candidates.length === 0) return;
-      fillSvgTargetPositions(candidates, targetPositions, count);
-      if (targetAttrRef.current) {
-        targetAttrRef.current.needsUpdate = true;
-      }
-      setIsLoaded(true);
-    });
-  }, [targetPositions, count]);
 
   const uniforms = useMemo(
     () => ({
@@ -158,13 +138,11 @@ export const Foliage: React.FC<FoliageProps> = ({ mode, count }) => {
         delta * 1.5,
       );
       material.uniforms.uProgress.value = progressRef.current;
+
+      // Slowly turn the present so it reads as 3D
+      meshRef.current.rotation.y += delta * 0.25;
     }
   });
-
-  // Don't render until SVG is loaded
-  if (!isLoaded) {
-    return null;
-  }
 
   return (
     <points ref={meshRef}>
@@ -183,9 +161,14 @@ export const Foliage: React.FC<FoliageProps> = ({ mode, count }) => {
         />
         <bufferAttribute
           attach="attributes-aTargetPos"
-          ref={targetAttrRef}
           count={count}
           array={targetPositions}
+          itemSize={3}
+        />
+        <bufferAttribute
+          attach="attributes-aColor"
+          count={count}
+          array={colors}
           itemSize={3}
         />
         <bufferAttribute
